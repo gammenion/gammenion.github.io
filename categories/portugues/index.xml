@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Portugues on Security of Things</title>
-    <link>https://gammenion.github.io/categories/portugues/</link>
+    <link>http://gammenion.github.io/categories/portugues/</link>
     <description>Recent content in Portugues on Security of Things</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 05 Mar 2016 14:23:22 +0100</lastBuildDate>
-    <atom:link href="https://gammenion.github.io/categories/portugues/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://gammenion.github.io/categories/portugues/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Coletando logs do Check Point usando fw1-loggrabber</title>
-      <link>https://gammenion.github.io/post/br/fw1-loggrabber/</link>
+      <link>http://gammenion.github.io/post/br/fw1-loggrabber/</link>
       <pubDate>Sat, 05 Mar 2016 14:23:22 +0100</pubDate>
       
-      <guid>https://gammenion.github.io/post/br/fw1-loggrabber/</guid>
+      <guid>http://gammenion.github.io/post/br/fw1-loggrabber/</guid>
       <description>
 
 &lt;h2 id=&#34;tl-dr:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;TL;DR&lt;/h2&gt;
@@ -48,7 +48,7 @@
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/01.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/01.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -57,7 +57,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/02.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/02.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -70,7 +70,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/03.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/03.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -79,7 +79,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/04.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/04.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -88,7 +88,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/05.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/05.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -108,7 +108,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/06.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/06.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -154,7 +154,7 @@ user@debian:~/fw1-loggrabber$ git clone https://github.com/certego/fw1-loggrabbe
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/07.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/07.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -166,7 +166,7 @@ user@debian:~/fw1-loggrabber$ git clone https://github.com/certego/fw1-loggrabbe
 &lt;p&gt;
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/08.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/08.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -198,7 +198,7 @@ user@debian:~/opsec-tools/linux22$ opsec_pull_cert -h 172.16.1.1 -n LogGrabberOP
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/09.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/09.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -231,7 +231,7 @@ user@debian:~/opsec-tools/linux22$ opsec_pull_cert -h 172.16.1.1 -n LogGrabberOP
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/10.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/10.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -240,7 +240,7 @@ O DN pode ser encontrado no campo em evidência abaixo:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;https://gammenion.github.io/img/11.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/img/11.png&#34; /&gt;
     
     
 &lt;/figure&gt;
