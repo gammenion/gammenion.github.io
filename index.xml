@@ -2,20 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Security of Things</title>
-    <link>localhost:1313</link>
+    <link>https://gammenion.github.io/</link>
     <description>Recent content on Security of Things</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>Content is free, no need for Copyright. Give credit when due.</copyright>
     <lastBuildDate>Mon, 07 Mar 2016 22:12:02 +0100</lastBuildDate>
-    <atom:link href="#ZgotmplZ" rel="self" type="application/rss+xml" />
+    <atom:link href="https://gammenion.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>About</title>
-      <link>localhost:1313</link>
+      <link>https://gammenion.github.io/about/</link>
       <pubDate>Mon, 07 Mar 2016 22:12:02 +0100</pubDate>
       
-      <guid>localhost:1313</guid>
+      <guid>https://gammenion.github.io/about/</guid>
       <description>
 
 &lt;h2 id=&#34;gama:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Gama&lt;/h2&gt;
@@ -30,10 +29,10 @@ GitHub: &lt;a href=&#34;https://github.com/gammenion&#34;&gt;https://github.com/
     
     <item>
       <title>Coletando logs do Check Point usando fw1-loggrabber</title>
-      <link>localhost:1313</link>
+      <link>https://gammenion.github.io/post/br/fw1-loggrabber/</link>
       <pubDate>Sat, 05 Mar 2016 14:23:22 +0100</pubDate>
       
-      <guid>localhost:1313</guid>
+      <guid>https://gammenion.github.io/post/br/fw1-loggrabber/</guid>
       <description>
 
 &lt;h2 id=&#34;tl-dr:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;TL;DR&lt;/h2&gt;
@@ -67,7 +66,7 @@ GitHub: &lt;a href=&#34;https://github.com/gammenion&#34;&gt;https://github.com/
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/01.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/01.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -76,7 +75,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/02.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/02.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -89,7 +88,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/03.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/03.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -98,7 +97,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/04.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/04.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -107,7 +106,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/05.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/05.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -127,7 +126,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/06.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/06.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -173,7 +172,7 @@ user@debian:~/fw1-loggrabber$ git clone https://github.com/certego/fw1-loggrabbe
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/07.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/07.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -185,7 +184,7 @@ user@debian:~/fw1-loggrabber$ git clone https://github.com/certego/fw1-loggrabbe
 &lt;p&gt;
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/08.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/08.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -217,7 +216,7 @@ user@debian:~/opsec-tools/linux22$ opsec_pull_cert -h 172.16.1.1 -n LogGrabberOP
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/09.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/09.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -250,7 +249,7 @@ user@debian:~/opsec-tools/linux22$ opsec_pull_cert -h 172.16.1.1 -n LogGrabberOP
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/10.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/10.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -259,7 +258,7 @@ O DN pode ser encontrado no campo em evidência abaixo:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/11.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/11.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -338,10 +337,10 @@ SYSLOG_FACILITY=&amp;quot;LOCAL1&amp;quot;
     
     <item>
       <title>Collecting logs from Check Point using fw1-loggrabber</title>
-      <link>localhost:1313</link>
+      <link>https://gammenion.github.io/post/en/fw1-loggrabber/</link>
       <pubDate>Sat, 05 Mar 2016 14:23:22 +0100</pubDate>
       
-      <guid>localhost:1313</guid>
+      <guid>https://gammenion.github.io/post/en/fw1-loggrabber/</guid>
       <description>
 
 &lt;h2 id=&#34;tl-dr:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;TL;DR&lt;/h2&gt;
@@ -375,7 +374,7 @@ SYSLOG_FACILITY=&amp;quot;LOCAL1&amp;quot;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/01.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/01.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -384,7 +383,7 @@ My Linux server is 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/02.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/02.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -397,7 +396,7 @@ My Linux server is 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/03.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/03.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -406,7 +405,7 @@ My Linux server is 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/04.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/04.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -415,7 +414,7 @@ My Linux server is 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/05.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/05.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -435,7 +434,7 @@ My Linux server is 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/06.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/06.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -481,7 +480,7 @@ user@debian:~/fw1-loggrabber$ git clone https://github.com/certego/fw1-loggrabbe
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/07.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/07.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -493,7 +492,7 @@ user@debian:~/fw1-loggrabber$ git clone https://github.com/certego/fw1-loggrabbe
 &lt;p&gt;
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/08.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/08.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -525,7 +524,7 @@ user@debian:~/opsec-tools/linux22$ opsec_pull_cert -h 172.16.1.1 -n LogGrabberOP
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/09.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/09.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -558,7 +557,7 @@ user@debian:~/opsec-tools/linux22$ opsec_pull_cert -h 172.16.1.1 -n LogGrabberOP
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/10.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/10.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -567,7 +566,7 @@ The DN can be found where it is highlighted below:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;localhost:1313/img/11.png&#34; /&gt;
+        &lt;img src=&#34;https://gammenion.github.io/img/11.png&#34; /&gt;
     
     
 &lt;/figure&gt;
