@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Security of Things</title>
+    <link>http://gammenion.github.io/post/</link>
+    <description>Recent content in Posts on Security of Things</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 05 Mar 2016 14:23:22 +0100</lastBuildDate>
+    <atom:link href="http://gammenion.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Collecting logs from Check Point using fw1-loggrabber</title>
+      <link>http://gammenion.github.io/post/fw1-loggrabber/</link>
+      <pubDate>Sat, 05 Mar 2016 14:23:22 +0100</pubDate>
+      
+      <guid>http://gammenion.github.io/post/fw1-loggrabber/</guid>
+      <description>
+
+&lt;h2 id=&#34;tl-dr:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;TL;DR&lt;/h2&gt;
+
+&lt;p&gt;Collecting logs from Check Point firewalls is tricky. Here I managed to use the fw1-loggrabber tool running on a Linux 32bit, grab logs from a Check Point Manager Gaia R77.30, store logs in a file and use logrotate to manage them.&lt;/p&gt;
+
+&lt;h2 id=&#34;intro:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;Intro&lt;/h2&gt;
+
+&lt;p&gt;Check Point is a wonderful product. Until you want to collect logs from it with an external tool. In my case, I need to collect logs to a Linux server so I can do some cool stuff with it. There are &lt;a href=&#34;https://www.fir3net.com/Firewalls/Check-Point/a-quick-guide-to-checkpoints-opsec-lea.html&#34;&gt;a lot&lt;/a&gt; &lt;a href=&#34;https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&amp;amp;solutionid=sk32521&#34;&gt;of&lt;/a&gt; &lt;a href=&#34;https://blog.rootshell.be/2014/08/28/check-point-firewall-logs-and-logstash-elk-integration/&#34;&gt;resources&lt;/a&gt; &lt;a href=&#34;http://www-01.ibm.com/support/knowledgecenter/SSSN2Y_1.0.0/com.ibm.itcim.doc/tcim85_install190.html%23opconz&#34;&gt;available&lt;/a&gt; on how to do this. Good luck with those. None of them helped me to achieve what I did in this post. That is why it is important for you to understand that this guide used Check Point Gaia R77.30. The hardware itself can be anything from a VM to a high end appliance. If you use anything else, it may work. Or it may not.&lt;/p&gt;
+
+&lt;p&gt;To collect logs from Check Point, the fw1-loggrabber tool will be used. This is &lt;a href=&#34;https://github.com/certego/fw1-loggrabber&#34;&gt;available here&lt;/a&gt;. You can also use the version &lt;a href=&#34;http://sourceforge.net/projects/fw1-loggrabber/&#34;&gt;available on sourceforge&lt;/a&gt; but this is outdated. You can see work done in the code base of the github version. This tool only runs on Linux x86, so a Linux Ubuntu x86 was installed in the Lab Server running at 172.16.1.10 with kernel 3.16. It also runs on kernel 4. The OPSEC LEA trust must be configured between Check Point Manager and the tool. The compilation of fw1-loggrabber will not work if all the Linux dependencies are not satisfied.&lt;/p&gt;
+
+&lt;p&gt;This exercise assumes that a lab environment is already prepared with:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;A Check Point Gaia R77.30 Gateway and Management. In my case, it&amp;rsquo;s a VM running both. This has IP address 172.16.1.1.&lt;/li&gt;
+&lt;li&gt;A Windows client to run the Check Point SmartDashboard. In my lab this has IP address 172.16.1.11&lt;/li&gt;
+&lt;li&gt;A Linux x86 client running kernel 3.16 to run the loggrabber tool. This has 172.16.1.10&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The process of creating the lab environment is up to you. If you want more information on this, leave a message below.&lt;/p&gt;
+
+&lt;h2 id=&#34;configuring-check-point:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;Configuring Check Point&lt;/h2&gt;
+
+&lt;p&gt;First we need to configure the Check Point Management server to accept the OPSEC LEA connection. This is how to achieve this.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Log in to SmartDashboard as an admin&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Create a Host object for the Linux server that will collect the logs:&lt;br /&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/01.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+
+My Linux server is 172.16.1.10:&lt;br /&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/02.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Create the OPSEC object:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Go to the &amp;ldquo;Servers and OPSEC&amp;rdquo; tab and right-click on the folder &amp;ldquo;OPSEC Application&amp;rdquo;. Create a &amp;ldquo;New OPSEC Application&amp;rdquo;:&lt;br /&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/03.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+&lt;/li&gt;
+&lt;li&gt;Configure the OPSEC object. Give it a name, select the Host you just created for the Linux server and select the option LEA:&lt;br /&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/04.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;Click on Communication and set up a new SIC one-time password. Bear in mind that once you do this, the access would be already available, no policy pushes required:&lt;br /&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/05.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;You may want to add a rule to allow the OPSEC LEA connection from the linux server to the Check Point gateway using TCP/18184 (FW1_lea)&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;From 172.16.1.10 to 172.16.1.1 on port TCP/18184&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;configuring-linux:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;Configuring Linux&lt;/h2&gt;
+
+&lt;p&gt;I am using a Debian 8.2 in the lab:
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/06.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+&lt;br /&gt;
+The fw1-loggrabber tool needs to be compiled from source. Let&amp;rsquo;s use linux user &lt;code&gt;user&lt;/code&gt; and the tool folder &lt;code&gt;/home/user/fw1-loggrabber&lt;/code&gt;.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Before using the tool, the following dependencies must be installed. This will probably tell you to install many more packages but it depends on the Linux server being used:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~$ apt-get install git gcc-multilib g++-multilib libelf-dev:i386
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Download the code for the tool:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~$ mkdir fw1-loggrabber; cd fw1-loggrabber
+user@debian:~/fw1-loggrabber$ git clone https://github.com/certego/fw1-loggrabber
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This will make the fw1-loggrabber source code be downloaded under &lt;code&gt;/home/user/fw1-loggrabber/fw1-loggrabber&lt;/code&gt;. Once it&amp;rsquo;s finally installed, all these folders may be cleaned up.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Download the necessary OPSEC development libraries from &lt;a href=&#34;supportcontent.checkpoint.com/file_download?id=7385&#34;&gt;Check Point here&lt;/a&gt;. Upload the file OPSEC_SDK_6.0_Linux.zip to the &lt;code&gt;/home/user/fw1-loggrabber&lt;/code&gt; folder and unzip it. This is required to compile fw1-loggrabber.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~/fw1-loggrabber$ unzip OPSEC_SDK_6.0_Linux.zip
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This zip contains the linux SDK on file &lt;code&gt;OPSEC_SDK_6_0.linux30.tar.gz&lt;/code&gt;. This file needs to be unziped in the same folder as fw1-loggrabber with command:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~/fw1-loggrabber$ tar zxvf OPSEC_SDK_6_0.linux30.tar.gz
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The files are extracted in folder &lt;code&gt;pkg_rel&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Compile fw1-loggrabber. But first, go to &lt;code&gt;/home/user/fw1-loggrabber/fw1-loggrabber&lt;/code&gt; and change this line in the &lt;code&gt;Makefile&lt;/code&gt; file to the following:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PKG_DIR = ../pkg_rel
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then finally compile the code and install it so you can use the fw1-loggrabber afterwards:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~/fw1-loggrabber/fw1-loggrabber$ make
+&lt;/code&gt;&lt;/pre&gt;
+
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/07.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+
+
+&lt;pre&gt;&lt;code&gt;user@debian:~/fw1-loggrabber/fw1-loggrabber$ sudo make install
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/08.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+&lt;br /&gt;
+The fw1-loggrabber tool is installed under &lt;code&gt;/usr/local/fw1-loggrabber/&lt;/code&gt;. When this is done, everything inside &lt;code&gt;/home/user/fw1-loggrabber/&lt;/code&gt; can be deleted with:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~/fw1-loggrabber/fw1-loggrabber$ cd
+user@debian:~$ rm -rf fw1-loggrabber/*
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Download the opsec-tools &lt;a href=&#34;http://sourceforge.net/projects/fw1-loggrabber/files/opsec-tools/NG-FP3/&#34;&gt;from here&lt;/a&gt;. This tool is used to integrate the Linux server with the Check Point Management server by supplying it the SIC. This tool is already compiled for Linux 32bit. Upload the downloaded file &lt;code&gt;opsec-tools.tar.gz&lt;/code&gt; to the home folder &lt;code&gt;/home/user/&lt;/code&gt; and unzip it. This tool can be used again later.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~/$ tar zxvf opsec-tools.tar.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Integrate the Linux server with the Check Point Manager via OPSEC by running the opsec-tools tool. This generates a TCP connection from the Linux server to the Check Point Manager on port TCP/18210 (FW1-ica-pull). For this, we will need the following:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The IP address of the Check Point Manager = 172.16.1.1. This goes in option &lt;code&gt;-h&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;The OPSEC object name that was created = LogGrabberOPSEC. This goes in option &lt;code&gt;-n&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;The password that was set for the communication (SIC). This goes in option &lt;code&gt;-p&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~$ cd opsec-tools/linux22
+user@debian:~/opsec-tools/linux22$ opsec_pull_cert -h 172.16.1.1 -n LogGrabberOPSEC -p &amp;lt;PASSWD&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The result in the shell:&lt;br /&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/09.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+&lt;/p&gt;
+
+&lt;p&gt;The output of this command gives us two fundamental pieces of information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The opsec.p12 file: it&amp;rsquo;s the certificate used for communication between the two servers&lt;/li&gt;
+&lt;li&gt;The Common Name (CN) of the certificate that is required by fw1-loggrabber. In this case, it is &lt;code&gt;CN=LogGrabberOPSEC,O=gw..n7symj&lt;/code&gt;. Now we have everything required to use the fw1-loggrabber tool.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Copy the &lt;code&gt;opsec.p12&lt;/code&gt; file to the fw1-loggrabber working directory:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~/opsec-tools/linux22$ cp opsec.p12 /home/user/fw1-loggrabber
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Configure the LEA configuration file. First, copy the sample to the working directory:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~$ cp /usr/local/fw1-loggrabber/etc/lea.conf-sample /home/user/fw1-loggrabber/lea.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Change the parameters inside the lea.conf file to what we grabbed before:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;lea_server ip&lt;/code&gt; is the IP of the Check Point Manager: 172.16.1.1&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;opsec_sic_name&lt;/code&gt; is the CN of the certificate that has been downloaded by the opsec-tool: &lt;code&gt;CN=LogGrabberOPSEC,O=gw..n7symj&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;opsec_sslca_file&lt;/code&gt; is the path to the opsec.p12 file downloaded by the opsec-tool: &lt;code&gt;/home/user/fw1-loggrabber/opsec.p12&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lea_server opsec_entity_sic_name&lt;/code&gt; is the Distinguished Name (DN) for the Check Point Manager certificate. This can be grabbed by going to Check Point SmartDashboard and editing the Check Point Manager object and clicking on Test SIC Status:&lt;br /&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/10.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+&lt;br /&gt;
+The DN can be found where it is highlighted below:&lt;br /&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://gammenion.github.io/img/11.png&#34; /&gt;
+    
+    
+&lt;/figure&gt;
+&lt;br /&gt;
+In this case, it is &lt;code&gt;cn=cp_mgmt,o=gw..n7symj&lt;/code&gt;. Finally, the lea.conf file has the following content:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;lea_server auth_type sslca
+lea_server ip 172.16.1.1
+lea_server auth_port 18184
+opsec_sic_name &amp;quot;CN=LogGrabberOPSEC,O=gw..n7symj&amp;quot;
+opsec_sslca_file /home/user/fw1-loggrabber/opsec.p12
+lea_server opsec_entity_sic_name &amp;quot;cn=cp_mgmt,o=gw..n7symj&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;It&amp;rsquo;s time to finally configure the fw1-loggrabber tool and supply the OPSEC LEA parameters. For simplicity, I use the default configuration file for fw1-loggrabber available in &lt;code&gt;/usr/local/fw1-loggrabber/etc/&lt;/code&gt;. Copy the configuration file to the working directory:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~$ cp /usr/local/fw1-loggrabber/etc/fw1-loggrabber.conf-sample /home/user/fw1-loggrabber/fw1-loggrabber.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I do minor tweats to this file but the documentation is pretty good in their &lt;a href=&#34;https://github.com/certego/fw1-loggrabber&#34;&gt;github repository&lt;/a&gt;. The following is the configuration file I use:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;DEBUG_LEVEL=&amp;quot;0&amp;quot;
+FW1_LOGFILE=&amp;quot;fw.log&amp;quot;
+FW1_OUTPUT=&amp;quot;logs&amp;quot;
+FW1_TYPE=&amp;quot;ng&amp;quot;
+FW1_MODE=&amp;quot;normal&amp;quot;
+ONLINE_MODE=&amp;quot;yes&amp;quot;
+RESOLVE_MODE=&amp;quot;no&amp;quot;
+RECORD_SEPARATOR=&amp;quot;|&amp;quot;
+DATEFORMAT=&amp;quot;std&amp;quot;
+LOGGING_CONFIGURATION=file
+OUTPUT_FILE_PREFIX=&amp;quot;fw1-loggrabber&amp;quot;
+OUTPUT_FILE_ROTATESIZE=1048576
+SYSLOG_FACILITY=&amp;quot;LOCAL1&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Run the tool. Notice that with this configuration file the output file will be saved at &lt;code&gt;fw1-lograbber.conf&lt;/code&gt;. If the tool runs correctly, the logs will be collected from the Check Point Manager indefinitely. Do yourself a favor and add the fw1-loggrabber executable to your PATH environment variable:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@debian:~/fw1-loggrabber$ /usr/local/fw1-loggrabber/bin/fw1-loggrabber -c fw1-loggrabber.conf -l lea.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;extras:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;Extras&lt;/h2&gt;
+
+&lt;h3 id=&#34;log-volume:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;Log Volume&lt;/h3&gt;
+
+&lt;p&gt;Depending on your Check Point installation, the log volume can be humongous. I don&amp;rsquo;t really want to have gigabytes of logs in one file. Logrotate is your friend.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/home/user/fw1-loggrabber/fw1-loggrabber.log{
+   size 100M
+   compress
+   compresscmd /usr/bin/xz
+   compressext .xz
+   rotate 1
+   copytruncate
+   nocreate
+   su user user
+   missingok
+   notifempty
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With logrotate&amp;rsquo;s &lt;code&gt;lastaction&lt;/code&gt; directive, you can do nice things to your log file, like stashing it for offline backup or anything else, let&amp;rsquo;s say, send to your AWS bucket.&lt;/p&gt;
+
+&lt;h3 id=&#34;extra-configuration-parameters:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;Extra configuration parameters&lt;/h3&gt;
+
+&lt;p&gt;You will quickly realize that the log file is poluted by repetitive and useless fields. I added the following line to the configuration file to remove annoying fields. Bear in mind these fields are not documented anywhere. Please let me know if they are.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;IGNORE_FIELDS=i/f_dir;i/f_name;has_accounting;uuid;product;__policy_id_tag;origin_sic_name;rule_uid;app_desc;app_id;app_category;matched_category;app_properties;app_rule_id;app_rule_name;app_sig_id;UserCheck_incident_uid
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I tried using the FW1_FILTER_RULE but it is so limited I gave up.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
