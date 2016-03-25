@@ -60,7 +60,7 @@
         },
         "datePublished": "2016-03-23",
         "description": "Configuração segura de SSH para setups simples",
-        "wordCount":  2549 
+        "wordCount":  2584 
     }
     </script>
     
@@ -106,7 +106,7 @@
 
   			<header class="post-header">
   				<span class="post-meta">
-						<span class="post-date">23 Mar 2016</span> <span class="reading-time">| <span class="estimated-reading-time">12 min.</span> (<span class="word-count">2549</span> mots)</span></span>
+						<span class="post-date">23 Mar 2016</span> <span class="reading-time">| <span class="estimated-reading-time">13 min.</span> (<span class="word-count">2584</span> mots)</span></span>
   				</span>
   				<div class="clear"></div>
   				<h1 class="post-title">Hardening de SSH para sua VPS</h1>
@@ -292,15 +292,15 @@ Essa parte precisa seguir o que configuramos no servidor SSH no VPS. Eu quero di
     UseRoaming no
 </code></pre>
 
-<p>Isso será aplicado a todos os servidores que eu conectar daqui em diantes. Se um servidor necessitar de um parâmetro diferente, crie uma entrada específica para aquele Host. Abaixo vemos também um exemplo para o Github.</p>
-
 <p>No exemplo acima, note as duas linhas de configuração extras:</p>
 
 <p>1.1) <code>ForwardAgent no</code>
     Essa é a configuração padrão, mas eu quero ter certeza de que se eu começar a usar o ssh-agent para gerenciar minhas chaves privadas, eu não quero que ele faça &ldquo;forward&rdquo; delas para servidores remotos.</p>
 
 <p>1.2) <code>UseRoaming no</code><br />
-    Esse é a funcionalidade miserável e não documentada que poderia expor minhas chaves privadas a atacantes no caso de um ataque MITM.</p></li>
+    Esse é a funcionalidade miserável e não documentada que poderia expor minhas chaves privadas a atacantes no caso de um ataque MITM.</p>
+
+<p>Isso será aplicado a todos os servidores que eu conectar daqui em diantes. Se um servidor necessitar de um parâmetro diferente, crie uma entrada específica para aquele Host. Você vai perceber rapidamente que essa configuração vai quebrar o acesso a alguns servidores, <em>incluindo Github</em>. Mais adiante eu mostro o exemplo de configuração específica para o Github.</p></li>
 
 <li><p>Crie uma chave para cada servidor que você tem acesso:<br />
 Nesse exemplo, eu criei uma específica para o Github. Não se esqueça de usar um passphrase complexo para criptografar sua chave:<br />
@@ -315,11 +315,13 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_github -C &quot;user@computer&quot; -
 <pre><code>Host github.com
     Hostname ssh.github.com
     Port 443
+    MACs hmac-sha2-512
     IdentityFile ~/.ssh/id_ed25519_github
 </code></pre>
 
-<p>Aqui está a <a href="https://help.github.com/articles/using-ssh-over-the-https-port/">ajuda do Github</a> em como configurar.<br />
-Para o seu próprio VPS, o processo é similar. Crie uma nova chave, crie o blocl <code>Host</code> no seu arquivo <code>~/.ssh/config</code>, adicione sua chave pública no arquivo <code>authorized_keys</code> no usuário do servidor, e pronto. Aqui está a entrada para o meu próprio VPS:</p>
+<p>Aqui está a <a href="https://help.github.com/articles/using-ssh-over-the-https-port/">ajuda do Github</a> em como configurar. Note que eu precisei adicionar o MAC específico que o Github aceita. Infelizmente,</p>
+
+<p>Para o seu próprio VPS, o processo é similar. Crie uma nova chave, crie o blocl <code>Host</code> no seu arquivo <code>~/.ssh/config</code>, adicione sua chave pública no arquivo <code>authorized_keys</code> no usuário do servidor, e pronto. Aqui está a entrada para o meu próprio VPS:</p>
 
 <pre><code>Host example.com
     ServerAliveInterval 30

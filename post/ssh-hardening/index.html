@@ -60,7 +60,7 @@
         },
         "datePublished": "2016-03-23",
         "description": "SSH hardening for simple setups",
-        "wordCount":  2329 
+        "wordCount":  2351 
     }
     </script>
     
@@ -106,7 +106,7 @@
 
   			<header class="post-header">
   				<span class="post-meta">
-						<span class="post-date">23 Mar 2016</span> <span class="reading-time">| <span class="estimated-reading-time">11 min.</span> (<span class="word-count">2329</span> mots)</span></span>
+						<span class="post-date">23 Mar 2016</span> <span class="reading-time">| <span class="estimated-reading-time">12 min.</span> (<span class="word-count">2351</span> mots)</span></span>
   				</span>
   				<div class="clear"></div>
   				<h1 class="post-title">Hardening SSH of your VPS</h1>
@@ -291,14 +291,14 @@ This needs to follow what we configured for our VPS. I want to tell my ssh clien
     UseRoaming no
 </code></pre>
 
-<p>This will be applied to all servers you connect from now on. If a server needs a different parameter, do it specifically for that Host. Below you see the example for Github.</p>
-
 <p>Notice two extra lines in this configuration:<br />
 1.1) <code>ForwardAgent no</code>
     This is the default configuration but I want to make sure that if I ever use the ssh-agent to manage my private keys, I don&rsquo;t want it to forward it to remote machines.</p>
 
 <p>1.2) <code>UseRoaming no</code><br />
-    The infamous undocumented &ldquo;feature&rdquo; and could expose user&rsquo;s keys to attackers on a MITM scenario.</p></li>
+    The infamous undocumented &ldquo;feature&rdquo; and could expose user&rsquo;s keys to attackers on a MITM scenario.</p>
+
+<p>This will be applied to all servers you connect from now on. If a server needs a different parameter, do it specifically for that Host. You will <em>quickly realize</em> that this may break connectivity to some servers, <em>including Github</em>. Below you see the example for Github and the specifics for its configuration.</p></li>
 
 <li><p>Create a key for every single server/system you have access to:
 In this example, I create one to use with Github. Don&rsquo;t forget to add a complex passphrase:
@@ -313,6 +313,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_github -C &quot;user@computer&quot; -
 <pre><code>Host github.com
     Hostname ssh.github.com
     Port 443
+    MACs hmac-sha2-512
     IdentityFile ~/.ssh/id_ed25519_github
 </code></pre>
 

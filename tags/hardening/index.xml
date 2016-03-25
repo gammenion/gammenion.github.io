@@ -193,14 +193,14 @@ This needs to follow what we configured for our VPS. I want to tell my ssh clien
     UseRoaming no
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;This will be applied to all servers you connect from now on. If a server needs a different parameter, do it specifically for that Host. Below you see the example for Github.&lt;/p&gt;
-
 &lt;p&gt;Notice two extra lines in this configuration:&lt;br /&gt;
 1.1) &lt;code&gt;ForwardAgent no&lt;/code&gt;
     This is the default configuration but I want to make sure that if I ever use the ssh-agent to manage my private keys, I don&amp;rsquo;t want it to forward it to remote machines.&lt;/p&gt;
 
 &lt;p&gt;1.2) &lt;code&gt;UseRoaming no&lt;/code&gt;&lt;br /&gt;
-    The infamous undocumented &amp;ldquo;feature&amp;rdquo; and could expose user&amp;rsquo;s keys to attackers on a MITM scenario.&lt;/p&gt;&lt;/li&gt;
+    The infamous undocumented &amp;ldquo;feature&amp;rdquo; and could expose user&amp;rsquo;s keys to attackers on a MITM scenario.&lt;/p&gt;
+
+&lt;p&gt;This will be applied to all servers you connect from now on. If a server needs a different parameter, do it specifically for that Host. You will &lt;em&gt;quickly realize&lt;/em&gt; that this may break connectivity to some servers, &lt;em&gt;including Github&lt;/em&gt;. Below you see the example for Github and the specifics for its configuration.&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;Create a key for every single server/system you have access to:
 In this example, I create one to use with Github. Don&amp;rsquo;t forget to add a complex passphrase:
@@ -215,6 +215,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_github -C &amp;quot;user@computer&amp
 &lt;pre&gt;&lt;code&gt;Host github.com
     Hostname ssh.github.com
     Port 443
+    MACs hmac-sha2-512
     IdentityFile ~/.ssh/id_ed25519_github
 &lt;/code&gt;&lt;/pre&gt;
 

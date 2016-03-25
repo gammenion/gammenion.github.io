@@ -194,15 +194,15 @@ Essa parte precisa seguir o que configuramos no servidor SSH no VPS. Eu quero di
     UseRoaming no
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Isso será aplicado a todos os servidores que eu conectar daqui em diantes. Se um servidor necessitar de um parâmetro diferente, crie uma entrada específica para aquele Host. Abaixo vemos também um exemplo para o Github.&lt;/p&gt;
-
 &lt;p&gt;No exemplo acima, note as duas linhas de configuração extras:&lt;/p&gt;
 
 &lt;p&gt;1.1) &lt;code&gt;ForwardAgent no&lt;/code&gt;
     Essa é a configuração padrão, mas eu quero ter certeza de que se eu começar a usar o ssh-agent para gerenciar minhas chaves privadas, eu não quero que ele faça &amp;ldquo;forward&amp;rdquo; delas para servidores remotos.&lt;/p&gt;
 
 &lt;p&gt;1.2) &lt;code&gt;UseRoaming no&lt;/code&gt;&lt;br /&gt;
-    Esse é a funcionalidade miserável e não documentada que poderia expor minhas chaves privadas a atacantes no caso de um ataque MITM.&lt;/p&gt;&lt;/li&gt;
+    Esse é a funcionalidade miserável e não documentada que poderia expor minhas chaves privadas a atacantes no caso de um ataque MITM.&lt;/p&gt;
+
+&lt;p&gt;Isso será aplicado a todos os servidores que eu conectar daqui em diantes. Se um servidor necessitar de um parâmetro diferente, crie uma entrada específica para aquele Host. Você vai perceber rapidamente que essa configuração vai quebrar o acesso a alguns servidores, &lt;em&gt;incluindo Github&lt;/em&gt;. Mais adiante eu mostro o exemplo de configuração específica para o Github.&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;Crie uma chave para cada servidor que você tem acesso:&lt;br /&gt;
 Nesse exemplo, eu criei uma específica para o Github. Não se esqueça de usar um passphrase complexo para criptografar sua chave:&lt;br /&gt;
@@ -217,11 +217,13 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_github -C &amp;quot;user@computer&amp
 &lt;pre&gt;&lt;code&gt;Host github.com
     Hostname ssh.github.com
     Port 443
+    MACs hmac-sha2-512
     IdentityFile ~/.ssh/id_ed25519_github
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Aqui está a &lt;a href=&#34;https://help.github.com/articles/using-ssh-over-the-https-port/&#34;&gt;ajuda do Github&lt;/a&gt; em como configurar.&lt;br /&gt;
-Para o seu próprio VPS, o processo é similar. Crie uma nova chave, crie o blocl &lt;code&gt;Host&lt;/code&gt; no seu arquivo &lt;code&gt;~/.ssh/config&lt;/code&gt;, adicione sua chave pública no arquivo &lt;code&gt;authorized_keys&lt;/code&gt; no usuário do servidor, e pronto. Aqui está a entrada para o meu próprio VPS:&lt;/p&gt;
+&lt;p&gt;Aqui está a &lt;a href=&#34;https://help.github.com/articles/using-ssh-over-the-https-port/&#34;&gt;ajuda do Github&lt;/a&gt; em como configurar. Note que eu precisei adicionar o MAC específico que o Github aceita. Infelizmente,&lt;/p&gt;
+
+&lt;p&gt;Para o seu próprio VPS, o processo é similar. Crie uma nova chave, crie o blocl &lt;code&gt;Host&lt;/code&gt; no seu arquivo &lt;code&gt;~/.ssh/config&lt;/code&gt;, adicione sua chave pública no arquivo &lt;code&gt;authorized_keys&lt;/code&gt; no usuário do servidor, e pronto. Aqui está a entrada para o meu próprio VPS:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;Host example.com
     ServerAliveInterval 30
