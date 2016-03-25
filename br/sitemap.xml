@@ -3,8 +3,13 @@
   
   <url>
     <loc>http://gammenion.github.io/</loc>
-    <lastmod>2016-03-05T14:23:22+01:00</lastmod>
+    <lastmod>2016-03-23T00:00:00+01:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://gammenion.github.io/br/post/ssh-hardening</loc>
+    <lastmod>2016-03-23T00:00:00+01:00</lastmod>
   </url>
   
   <url>

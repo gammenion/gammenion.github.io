@@ -1,0 +1,463 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+    <head>
+
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+        <meta property="og:title" content=" Hardening de SSH para sua VPS &middot;  Segurança das Coisas" />
+        <meta property="og:site_name" content="Segurança das Coisas" />
+        <meta property="og:url" content="http://gammenion.github.io/br/post/ssh-hardening" />
+
+    
+        <meta property="og:type" content="article" />
+        <meta property="og:article:published_time" content="2016-03-23T00:00:00&#43;01:00" />
+        <meta property="og:article:tag" content="SSH" />
+        <meta property="og:article:tag" content="Hardening" />
+        
+
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@gammenion" />
+        <meta name="twitter:creator" content="@gammenion" />
+        <meta name="twitter:title" content="Hardening de SSH para sua VPS" />
+        <meta name="twitter:description" content="Configuração segura de SSH para setups simples" />
+        <meta name="twitter:url" content="http://gammenion.github.io/br/post/ssh-hardening" />
+    
+
+        <title> Hardening de SSH para sua VPS &middot;  Segurança das Coisas</title>
+
+    
+        <meta name="description" content="Configuração segura de SSH para setups simples" />
+    
+
+        <meta name="p:domain_verify" content="fc173d84e3a4de948ed4bda2908afd3e"/>
+        <meta name="HandheldFriendly" content="True" />
+        <meta name="MobileOptimized" content="320" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        
+        
+
+    
+        <link href="http://gammenion.github.io/index.xml" rel="alternate" type="application/rss+xml" title="Segurança das Coisas" />
+    
+
+    
+        <link rel="canonical" href="http://gammenion.github.io/br/post/ssh-hardening" />
+        <link rel='shortcut icon' href='/img/favicon.ico' type='image/x-icon'/ >
+        
+    
+    <script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Hardening de SSH para sua VPS",
+        "author": {
+            "@type": "Person",
+            "name": "http://profiles.google.com/?rel=author"
+        },
+        "datePublished": "2016-03-23",
+        "description": "Configuração segura de SSH para setups simples",
+        "wordCount":  2549 
+    }
+    </script>
+    
+
+    <style>
+@charset "UTF-8";article,header,img,main,nav,section{display:block}blockquote,p,pre,ul{margin:2em auto}#wrapper,pre{width:100%;box-sizing:border-box}#nav,#wrapper,code{position:relative}#nav,body{background:#fff}#menu,blockquote,pre code{background:0 0}#menu,#menu .menu-header,#menu .menu-list,#wrapper,.post-nav .post-nav-item .post-nav-teaser .post-nav-info,blockquote,pre{box-sizing:border-box}img{border:0;max-width:100%;height:auto;margin:2.5em auto}html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}code,pre{font-family:monospace,monospace;font-size:1em}@font-face{font-family:'Merriweather Sans';font-style:normal;font-weight:300;src:local("Merriweather Sans Light"),local("MerriweatherSans-Light"),url(//fonts.gstatic.com/s/merriweathersans/v5/6LmGj5dOJopQKEkt88GowY_zIojJi0m4a5Z6tRh6itY.woff) format("woff")}@font-face{font-family:'Merriweather Sans';font-style:normal;font-weight:400;src:local("Merriweather Sans Regular"),local("MerriweatherSans-Regular"),url(//fonts.gstatic.com/s/merriweathersans/v5/AKu1CjQ4qnV8MUltkAX3sL2aU247V0zTzydO4RoO9Ok.woff) format("woff")}@font-face{font-family:'Merriweather Sans';font-style:normal;font-weight:700;src:local("Merriweather Sans Bold"),local("MerriweatherSans-Bold"),url(//fonts.gstatic.com/s/merriweathersans/v5/6LmGj5dOJopQKEkt88GowQfd-b-I5PxxcmB4_-MNcqw.woff) format("woff")}@font-face{font-family:'Merriweather Sans';font-style:normal;font-weight:800;src:local("Merriweather Sans ExtraBold"),local("MerriweatherSans-ExtraBold"),url(//fonts.gstatic.com/s/merriweathersans/v5/6LmGj5dOJopQKEkt88GowWT7sFQ1Iz1BbpcuCPlgc9Q.woff) format("woff")}@font-face{font-family:'Merriweather Sans';font-style:italic;font-weight:300;src:local("Merriweather Sans Light Italic"),local("MerriweatherSans-LightItalic"),url(//fonts.gstatic.com/s/merriweathersans/v5/nAqt4hiqwq3tzCecpgPmVX9UU5BmOJGkLxUCVv5VXdc.woff) format("woff")}@font-face{font-family:'Merriweather Sans';font-style:italic;font-weight:400;src:local("Merriweather Sans Italic"),local("MerriweatherSans-Italic"),url(//fonts.gstatic.com/s/merriweathersans/v5/3Mz4hOHzs2npRMG3B1ascf0KIgDhPIHb_R-SWdtqte8.woff) format("woff")}@font-face{font-family:'Merriweather Sans';font-style:italic;font-weight:700;src:local("Merriweather Sans Bold Italic"),local("MerriweatherSans-BoldItalic"),url(//fonts.gstatic.com/s/merriweathersans/v5/nAqt4hiqwq3tzCecpgPmVYM8pfYvjMoOxygpzLVILAs.woff) format("woff")}@font-face{font-family:Inconsolata;font-style:normal;font-weight:400;src:local("Inconsolata"),url(//fonts.gstatic.com/s/inconsolata/v12/BjAYBlHtW3CJxDcjzrnZCIbN6UDyHWBl620a-IRfuBk.woff) format("woff")}@font-face{font-family:Inconsolata;font-style:normal;font-weight:700;src:local("Inconsolata Bold"),local("Inconsolata-Bold"),url(//fonts.gstatic.com/s/inconsolata/v12/AIed271kqQlcIRSOnQH0yTqR_3kx9_hJXbbyU8S6IN0.woff) format("woff")}@font-face{font-family:icons;src:url(../fonts/icons.eot?9273991);src:url(../fonts/icons.eot?9273991#iefix) format("embedded-opentype"),url(../fonts/icons.woff?9273991) format("woff"),url(../fonts/icons.ttf?9273991) format("truetype"),url(../fonts/icons.svg?9273991#icons) format("svg");font-weight:400;font-style:normal}[class^=icon-]:before{font-family:icons;font-style:normal;font-weight:400;speak:none;display:inline-block;text-decoration:inherit;width:1em;margin-right:.2em;text-align:center;font-variant:normal;text-transform:none;line-height:1em;margin-left:.2em;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.icon-arrow-left:before{content:'\e804'}.icon-arrow-right:before{content:'\e807'}.icon-rss:before{content:'\e808'}.icon-menu:before{content:'\e809'}body{margin:0;font:300 1em/1.5em 'Merriweather Sans',sans-serif;color:#595B66}blockquote,i{font-style:italic}code,pre{font-family:Inconsolata,monospace}a,blockquote,code,i{font-weight:400}::-moz-selection{color:#222;background:#D6EDFF;text-shadow:none}::-moz-selection,::selection{color:#222;background:#D6EDFF;text-shadow:none}a{background-color:transparent;color:inherit;text-decoration:none;transition:all ease-out .2s}.post-content a{border-bottom:2px solid #36D995}h1,h4{text-rendering:optimizeLegibility;color:#1F2026}h1{font-size:2em;line-height:1em;margin:2em 0 -.5em}h4{font-size:1.25em;line-height:1.2em;margin:2.4em 0 -.8em}ul{list-style:none;padding-left:3em}blockquote{padding:0 1em;border-left:.25em solid #D4D5D9;color:#595B66}blockquote *{margin:1em auto}blockquote :first-child{margin-top:0}blockquote :last-child{margin-bottom:0}i{color:#363740}code{display:inline-block;top:-1px;padding:3px 6px;margin:-1px 2px;font-size:.875em;line-height:1.143em;background:#E1E2E6;color:#000;border-radius:2px}pre{padding:1em;white-space:pre;overflow:auto;background:#9D9FA6;color:#fff}pre code{position:static;top:auto;font-size:1em;line-height:1.5em;white-space:-moz-pre-wrap;white-space:pre-wrap;vertical-align:inherit;border:none;padding:0}#menu .menu-header:before,.post .post-title:before{border-bottom:4px solid #36D995;content:''}.inner{max-width:48em;margin:0 auto;padding:0 1em}#wrapper{min-height:100vh;padding-bottom:6em;background:#F2F3F5}#push{-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;opacity:1}#nav{z-index:70;transition:all ease-out .4s;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;opacity:1}#nav:after{clear:both;content:'';display:table}#nav .nav-logo{float:left;height:2em;padding:1em;max-width:50%}#nav .nav-logo img{width:auto;max-width:none;height:2em;margin:0}#nav .nav-menu{float:right}#nav .nav-menu:after{clear:both;content:'';display:table}#nav .nav-menu a{display:block;width:1em;height:1em;line-height:1em;padding:1.5em;text-align:center;float:left;cursor:pointer}#nav .nav-menu a i:before{margin:auto}#menu{display:none;position:fixed;left:50%;top:5%;width:30em;height:90%;margin-left:-15em;padding:3em 0 0;overflow:hidden;transition:all ease-out .3s;-webkit-transform:translate3d(0,2em,0);transform:translate3d(0,2em,0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;opacity:0;z-index:100}@media only screen and (max-width:50em){#menu{width:90%;left:5%;margin-left:auto}}#menu .menu-header{position:absolute;left:0;top:0;width:100%;height:3.5em;padding:1em 1.5em .5em;margin-bottom:1em;line-height:2em;z-index:110;background:#fff}#menu .menu-header:before{position:absolute;left:-5%;bottom:-1em;width:110%;height:2em;background:#fff;box-shadow:0 .125em .125em rgba(0,0,0,.1);-webkit-transform:rotate(2.5deg);transform:rotate(2.5deg);transition:all ease-out .2s;z-index:115}#menu .menu-header:after{clear:both;content:'';display:table}#menu .menu-header .menu-label{position:relative;display:block;float:left;z-index:120}#menu .menu-header .menu-close{position:relative;display:block;float:right;width:2em;height:2em;padding:1em;margin:-1em -1.5em -1em 0;cursor:pointer;z-index:125}#menu .menu-header .menu-close:after,#menu .menu-header .menu-close:before{content:'';position:absolute;left:50%;top:50%;background:#9D9FA6;-webkit-transform:rotate(45deg);transform:rotate(45deg)}.overlay,.overlay:before{top:0;width:100%;height:100%}#menu .menu-header .menu-close:after{width:2px;height:1em;margin:-.5em 0 0 -1px}#menu .menu-header .menu-close:before{width:1em;height:2px;margin:-1px 0 0 -.5em}#menu .menu-list{position:relative;list-style:none;margin:0;padding:2em 0;height:100%;overflow-x:hidden;overflow-y:scroll;background:#fff}.overlay{position:fixed;left:0;z-index:80;display:none}.overlay:before{content:'';position:absolute;left:0;background:#1F2026;opacity:0;transition:all ease-out .3s;-webkit-transform-style:preserve-3d;transform-style:preserve-3d}.post{position:relative;z-index:20}.post .post-meta{display:block;font-size:.75em;line-height:1.334em;font-weight:400;margin-bottom:1.334em}.post .post-title{position:relative;color:#000;font-size:2em;line-height:1.375em;font-weight:800;text-indent:-1px;margin:.25em 0 .75em}.post .post-title:before{position:absolute;left:0;bottom:-.334em;width:1em;margin-bottom:-2px}.post .post-header{padding:4em 0 0;margin-bottom:3em}.post-footer .post-share a span{display:none}.post-nav .post-nav-item{position:fixed;top:50%;display:block;margin-top:-4em;overflow:hidden;border-radius:10em;transition:none}@media only screen and (max-width:70em){.post-nav .post-nav-item{position:absolute;top:auto;margin:auto;max-width:50%}}.post-nav .post-nav-item.post-nav-next{left:0;text-align:left}.post-nav .post-nav-item.post-nav-next .post-nav-icon{float:left}.post-nav .post-nav-item.post-nav-next .post-nav-icon i{left:-.05em}.post-nav .post-nav-item.post-nav-next .post-nav-info{padding-left:6em}.post-nav .post-nav-item.post-nav-prev{right:0;text-align:right}.post-nav .post-nav-item.post-nav-prev .post-nav-icon{float:right}.post-nav .post-nav-item.post-nav-prev .post-nav-icon i{right:-.05em}.post-nav .post-nav-item.post-nav-prev .post-nav-info{padding-right:6em}.post-nav .post-nav-item .post-nav-teaser{display:block;padding:1em;transition:all ease-out .2s;max-width:25em;overflow:visible}.post-nav .post-nav-item .post-nav-teaser:after{clear:both;content:'';display:table}.post-nav .post-nav-item .post-nav-teaser .post-nav-icon{display:block;width:5em;height:5em;line-height:5em;text-align:center;box-sizing:border-box;border-radius:10em;border:1px solid #36D995;box-shadow:0 0 0 0 transparent;transition:all ease-out .1s;background:#F2F3F5}.post-nav .post-nav-item .post-nav-teaser .post-nav-icon i{position:relative;font-size:2em}@media only screen and (max-width:30em){.post-nav .post-nav-item .post-nav-teaser .post-nav-icon{width:4em;height:4em;line-height:4em}.post-nav .post-nav-item .post-nav-teaser .post-nav-icon i{font-size:1.5em}}.post-nav .post-nav-item .post-nav-teaser .post-nav-icon i:before{margin:auto}.post-nav .post-nav-item .post-nav-teaser .post-nav-info{display:none;width:100%;transition:all ease-out .2s}.post-nav .post-nav-item .post-nav-teaser .post-nav-info .post-nav-title{display:block;max-height:1.25em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:1.25em 0 .25em;font-size:1em;line-height:1.25em;font-weight:700;color:#363740}.post-nav .post-nav-item .post-nav-teaser .post-nav-info .post-nav-excerpt{display:block;max-height:1.334em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0;font-size:.75em;line-height:1.334em;font-weight:400;color:#9D9FA6}
+</style>
+
+
+    </head>
+    <body class="home-template">
+      <section id="wrapper">
+        <div id="ajax-container">
+          <nav id="nav" class="nav">
+            <div class="nav-logo">
+              <a href="http://gammenion.github.io/">
+                
+                <img src="/img/logo.jpg" alt="Logo" />
+                
+              </a>
+            </div>
+            <div class="nav-menu">
+              <a class="menu" href="https://twitter.com/gammenion" title="@gammenion"><img src="/img/twitter.png" /></a>
+              <a class="menu" href="https://github.com/gammenion" title="gammenion"><img src="/img/github.png" /></a>
+            
+              <a class="menu" href="/br/post/ssh-hardening/" title="Open in English"><img src="/img/usa.png" /></a>
+            
+              <a class="rss" href="">
+                <i class="icon-rss"></i>
+              </a>
+              
+              <a class="menu" data-action="menu" data-target="menu"><i class="icon-menu"></i></a>
+              
+            </div>
+          </nav>
+
+
+<main class="content" role="main">
+	<article class="post">
+		<div class="inner">
+
+			<div id="push">
+
+  			<header class="post-header">
+  				<span class="post-meta">
+						<span class="post-date">23 Mar 2016</span> <span class="reading-time">| <span class="estimated-reading-time">12 min.</span> (<span class="word-count">2549</span> mots)</span></span>
+  				</span>
+  				<div class="clear"></div>
+  				<h1 class="post-title">Hardening de SSH para sua VPS</h1>
+  			</header>
+
+  			<section class="post-content">
+  				
+
+<h2 id="tl-dr:a6b9f62d776ebe461e78b63abd067512">TL;DR</h2>
+
+<p>VPS - Virtual Private Servers - normalmente vem com um monte de configurações padrão. Nesse post eu descrevo como configurar o servidor SSH de forma segura para um servidor simples, como um VPS onde eu sou o único usuário e eu tenho controle total do servidor e do cliente.</p>
+
+<h2 id="intro:a6b9f62d776ebe461e78b63abd067512">Intro</h2>
+
+<p>Um dos benefícios de se ter uma VPS
+One of the things of having a VPS - Virtual Private Server - é a liberdade de fazer o que quiser com um sistema que está no ar o tempo todo <a href="https://www.ovh.com/us/dedicated-cloud/discover/sla.xml">(ou quase o tempo todo)</a>. Eu uso OVH por razões que me fogem da memória. Na verdade, isso não importa. Onde quer que o servidor esteja, seja na Amazon AWS, Microsoft Azure, Linode, um Raspberry Pi rodando na sua sala ou o seu <a href="http://libertyvps.net/">provedor &ldquo;underground&rdquo;/privado favorito que aceita bitcoins</a>, ele não contará com uma configuração padrão ao nível de um administrator consciente de segurança.</p>
+
+<p>Na atualidade, o SSH é o de facto standard para acesso remoto. Os tempos áureos do telnet em um hub de 10Mbps, onde conseguia-se sniffar tudo, estão acabados. Apesar disso, configurar e usar criptografia é um desafio, e SSH não é diferente.</p>
+
+<p>O objetivo principal de usar SSH e um túnel criptografado entre dois computadores é proteger o conteúdo que trafega entre eles através do canal encriptado - e também muitos outros atributos de segurança, como autenticação e integridade de mensagem. Se esse túnel for comprometido por algum motivo, más coisas podem acontecer.</p>
+
+<p>Existem <a href="http://www.coresecurity.com/content/ssh-insertion-attack">vários</a> <a href="https://blog.sucuri.net/2013/07/ssh-brute-force-the-10-year-old-attack-that-still-persists.html">tipos</a> <a href="https://sites.google.com/site/clickdeathsquad/Home/cds-ssh-mitmdowngrade">de ataques</a> que focam no lado criptográfico do SSH e não no protocolo propriamente dito. Dá um Google em &ldquo;SSH attacks&rdquo; pra você ver.</p>
+
+<p>No decorrer desse post eu vou mostrar as fontes de informação que eu coletei para criar a configuração do meu SSH. Eu não vou fazer desenhos de como SSH funciona, sobre key exchange, MACs ou qualquer outra coisa porque já existem muitos sites por aí com explicações brilhantes. Eu também não entrarei em muitos detalhes em relação a criptografia propriamente dita- apesar de ser um tópico muito interessante, não é o foco desse post.</p>
+
+<p>Vale aqui a menção ao <a href="https://stribika.github.io/2015/01/04/secure-secure-shell.html">blog post do stribika</a> que me inspirou a fazer tudo isso, apesar de não estar fazendo isso para me proteger de uma certa agência norte-americana de três letras que não deve ser nomeada. Segurança está livremente disponível e eu usar a melhor que tem. Ponto.</p>
+
+<h2 id="o-início:a6b9f62d776ebe461e78b63abd067512">O Início</h2>
+
+<p>Primeiro de tudo, é necessário entender algo sobre SSH que eu relevei por MUITO tempo. Conectar um computador com o outro envolve DOIS computadores. <em>Não é suficiente</em> otimizar a configuração somente do servidor SSH. Veja referências ao <a href="https://www.digitalocean.com/community/tutorials/how-to-fix-openssh-s-client-bug-cve-0216-0777-and-cve-0216-0778-by-disabling-useroaming">CVE-0216-0777 e CVE-0216-0778</a> em relação ao UseRoaming e também sobre esse excelente trabalho de <a href="https://github.com/FiloSottile/whosthere">Filippo Valsorda</a> onde ele identifica quem você é pela chave SSH que você usa.</p>
+
+<p>Eu vou começar com a configuração do servidor e depois vou para o cliente. <em>NÃO PULE A CONFIGURAÇÃO DO CLIENTE</em> como eu fiz por muitos anos da minha vida.</p>
+
+<h2 id="o-servidor:a6b9f62d776ebe461e78b63abd067512">O Servidor</h2>
+
+<p>Você recebe o servidor VPS. Beleza! Você sabe quais são as chaves SSH que o servidor está usando e quais opções de criptografia que foram usados para criá-las? Muitos desses VPS se valem de configurações automáticas de geração de chave do pacote do servidor openssh durante seu provisionamento automático, o que é mais ou menos tudo bem. O fato é que eu não confio o suficiente no provedor (para criação da chave SSH, e não por ter a habilidade de acessar todos os meus dados armazenados em disco e em memória, e roubar todas as minhas chaves).</p>
+
+<p>Existem <em>histórias de horror</em> como <a href="http://wiki.hetzner.de/index.php/Ed25519/en">esse aqui</a> onde Hetzner, um provedor de VPS, reusou a mesma chave do servidor de SSH em uma série de clientes devido a um erro de configuração.</p>
+
+<p><code>Due to an error in the installation software introduced on April 10th, 2015, the Ed25519 SSH host keys (/etc/ssh/ssh_host_ed25519_key) on our standard images were no longer automatically regenerated. This resulted in identical Ed25519 SSH host keys for each affected OS image.</code> &ndash; Hetzner</p>
+
+<p>Lembrando. Eu sou o único usuário desse sistema. Eu decido qual é o nível de criptografia eu quero e eu não me importo com &ldquo;backward compatibility&rdquo; e clientes SSH velhos. Meu objetivo é usar o maior nível de criptografia possível, evitar ataques de &ldquo;downgrade&rdquo;, dificultar a descriptografia do meu tráfego por atacantes, etc. Eu crio e protejo minhas próprias senhas.</p>
+
+<ol>
+<li><p>Recrie as chaves do seu servidor SSH<br />
+Não existe razão para o servidor oferecer múltiplas chaves para autenticação do servidor. A ferramenta <code>ssh-keygen</code> oferece uma série de opções para o tipo de chave para criar. Minha opção é sempre usar <a href="https://ed25519.cr.yp.to/">ed25519</a> mesmo que RSA com uma chave suficientemente grande seja igualmente seguro. Minha chave então se chama <code>/etc/ssh/ssh_server_ed25519</code>.</p>
+
+<pre><code>ssh-keygen -t ed25519 -f /etc/ssh/ssh_server_ed25519 -o -a 128
+</code></pre>
+
+<p>Essa chave não pode ter um passphrase. É assim que SSH funciona. Você reinicia o servidor, o SSH inicializa e tudo funciona. Tenha certeza de que as permissões para o novo arquivo de chave criado é 600 (-rw&mdash;&mdash;-).<br />
+Note o parâmetro <code>-o -a 128</code>. Esse é o número de rodadas usado para derivar a chave. O padrão é 16. Nossos computadores poderosos são capazes de fazer essa matemática em 2 segundos, mais ou menos. Existe uma boa explicação para isso <a href="https://martin.kleppmann.com/2013/05/24/improving-security-of-ssh-private-keys.html">aqui</a><br />
+Para evitar falha de configuração, certifique-se de remove todas as chaves antigas que estavam no servidor anteriormente.</p>
+
+<p>Também, note a digital (fingerprint) das chave pública que acabou de ser gerada. A saída é parecida com essa:</p>
+
+<pre><code>The key fingerprint is:
+ed:9a:3d:e6:dd:61:4d:99:cd:68:09:6c:b0:af:e2:4e example.com
+</code></pre>
+
+<p>Você pode verificar isso depois com o seguinte comando:</p>
+
+<pre><code>ssh-keygen -lf /etc/ssh/ssh_server_ed25519.pub
+</code></pre></li>
+
+<li><p>Reconfigure o arquivo <code>/etc/ssh/sshd_config</code><br />
+A maioria das configurações e explicações estão aqui. Abaixo está a cópia do meu próprio <code>sshd_config</code> e vamos linha por linha. Algumas linhas já são a configuração padrão do SSH, mas eu quero ter certeza total do comportamento que eu quero.</p>
+
+<pre><code>Port 22
+Protocol 2
+HostKey /etc/ssh/ssh_server_ed25519
+AllowGroups ssh-allowed
+ClientAliveInterval 300
+ClientAliveCountMax 0
+KexAlgorithms curve25519-sha256@libssh.org
+Ciphers chacha20-poly1305@openssh.com
+MACs hmac-sha2-512-etm@openssh.com
+UsePrivilegeSeparation yes
+SyslogFacility AUTH
+LogLevel VERBOSE
+LoginGraceTime 120
+PermitRootLogin no
+StrictModes yes
+PubkeyAuthentication yes
+IgnoreRhosts yes
+HostbasedAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+X11Forwarding no
+PrintMotd no
+PrintLastLog yes
+TCPKeepAlive yes
+UseLogin no
+PermitTunnel no
+AcceptEnv LANG LC_*
+Subsystem sftp /usr/lib/openssh/sftp-server
+UsePAM no
+</code></pre>
+
+<p>Aqui está a explicação para os pedaços importantes:</p>
+
+<p>2.1) <code>Port 22</code><br />
+    Somente aceite conexões na porta 22 em todas as interfaces de rede do servidor. Mudar isso para um outro valor por motivos de &ldquo;segurança&rdquo; significa segurança por obscuridade e é ridículo, na minha opinião. Ao invés disso, é melhor usar um firewall local que filtre conexões de entrada baseados no endereço IP de origem.</p>
+
+<p>2.2) <code>Protocol 2</code><br />
+    Porque protocol 1 já está ultrapassado e não oferece mais segurança.</p>
+
+<p>2.3) <code>HostKey /etc/ssh/ssh_server_ed25519</code><br />
+    A nova chave do servidor que se acabou de criar.</p>
+
+<p>2.4) <code>AllowGroups ssh-allowed</code><br />
+    Somente usuários do grupo Linux <code>ssh-allowed</code> são permitidos de entrar através de SSH. Isso é pra proteger a mim mesmo de possíveis erros, tipo criando um usuário temporário e acabar afetando a segurança do servidor.</p>
+
+<p>2.5) <code>ClientAliveInterval 300</code> and <code>ClientAliveCountMax 0</code><br />
+    Tempo de inatividade do usuário em segundos. Isso é forçado no lado do servidor.</p>
+
+<p>2.6) <code>KexAlgorithms curve25519-sha256@libssh.org</code><br />
+    Não existe razão para usar múltiplos algoritmos de key exchange. Usar ECDH com Curve25519 com SHA2 é perfeitamente ok e eu não quero ligar pra moduli com tamanhos de bit insuficientes no cado de Diffie-Hellman group exchanges.</p>
+
+<p>2.7) <code>Ciphers chacha20-poly1305@openssh.com</code><br />
+    Essa é a criptografia simétrica que finalmente criptografa o conteúdo indo pelo túnel entre o cliente e servidor. Esse cipher oferece o melhor disponível, evita análise de tráfego por um atacante, e por aí vai.</p>
+
+<p>2.8) <code>MACs hmac-sha2-512-etm@openssh.com</code><br />
+    Para a integridade da comunicação, esse algoritmo fornece Encrypt-then-MAC com a maior tamanho de chave disponível.</p>
+
+<p>2.9) <code>UsePrivilegeSeparation yes</code><br />
+    Não rode o daemon ssh com uma conta privilegiada. Essa configuração cria processos filhos não-privilegiados para lidar com o tráfego de rede. Se o servidor for comprometido através do daemon ssh, o atacante receberá acesso com poucos privilégios e precisará trabalhar mais para escalar privilégios.</p>
+
+<p>2.10) <code>LogLevel VERBOSE</code><br />
+    Temos muito espaço em disco, então porque não fazer log de todas as informações disponíveis de um dos serviços mais importantes do meu VPS.</p>
+
+<p>2.11) <code>PermitRootLogin no</code><br />
+    Essa é a configuração default, mas alguns VPS te dão acesso remoto direto com root por default. Você não quer usar root pra acesso remoto ao servidor. Crie seu próprio usuário não privilegiado para se conectar remotamente e somente escale privilégios quando necessário.</p>
+
+<p>2.12) <code>StrictModes yes</code><br />
+    Isso me protege contra falha de configuração. Ele checa se as permissões dos arquivos de chave, entre outras coisas, estão devidamente configuradas.</p>
+
+<p>2.13) <code>PubkeyAuthentication yes</code><br />
+    Permita autenticação com chaves públicas. Isso é fundamental para o que estamos querendo fazer e desabilitar autenticação por senha.</p>
+
+<p>2.14) <code>IgnoreRhosts yes</code> and <code>HostbasedAuthentication no</code><br />
+    Esse é o padrão, mas eu quero ter certeza.</p>
+
+<p>2.15) <code>PasswordAuthentication no</code> and <code>PermitEmptyPasswords no</code><br />
+    Eu quero fazer login usando uma chave, e não com a senha do meu usuário no Linux.</p>
+
+<p>2.16) <code>ChallengeResponseAuthentication no</code><br />
+    Esse é complicado e eu uso as duas formas. Até o manual do sshd-config é difícil de entender. Se eu quero somente me autenticar usando minha chave, eu coloco <code>no</code>. Mais a frente eu discuto duplo-fator de autenticação, onde será necessário mudar essa configuração pra <code>yes</code>.</p>
+
+<p>2.17) <code>X11Forwarding no</code><br />
+    Eu não uso X11, o padrão é <code>no</code> mas eu quero ter certeza.</p>
+
+<p>2.18) <code>UseLogin no</code><br />
+    Esse é o padrão, mas eu quero ter certeza de que <code>login(1)</code> não será usado para autenticação.</p>
+
+<p>2.19) <code>PermitTunnel no</code><br />
+    Esse é o padrão, mas eu quero ter certeza de que eu somente uso SSH para conectar a VPS, nada mais.</p>
+
+<p>2.20) <code>UsePAM no</code><br />
+    Essa configuração é parecida com o ChallengeResponseAuthentication. Se eu estou usando somente a chave para autenticação, eu coloco <code>no</code>. Se eu uso qualquer outra coisa, eu uso <code>yes</code>.</p></li>
+</ol>
+
+<h2 id="o-cliente:a6b9f62d776ebe461e78b63abd067512">O Cliente</h2>
+
+<p>A configuração do cliente é muito semelhante a do servidor. Você cria chaves fortes, define algoritmos critográficos para tudo, disabilita coisas inúteis, pronto.</p>
+
+<p>Mas o ponto mais importante aqui é o uso de chaves diferentes para servidores diferentes. No passado, eu usava apenas uma chave e adicionava ela no arquivo authorized_keys de todos os servidores em que eu tinha acesso. No final, eu não tinha mais idéia de onde as chaves estavam, quais servidores eu tinha acesso, etc. O risco aqui é que se sua chave privada for comprometida, perdida, roubada, copiada sem querer no Dropbox/Github/USB, vai ser muito difícil saber o tamanho do estrago.</p>
+
+<p>Por isso, eu proponho o uso de uma chave diferente para cada servidor eu gerencio. Sim, isso cria um stress gerencial, mas estamos falando sobre melhores hábitos de segurança e, no final das contas, eu não tenho acesso a muitos servidores mesmo. Eu estou falando sobre meu próprio VPS. Então porque não criar uma chave separada para acessá-lo? Isso também é válido para serviços como Github e tudo o que usa SSH.</p>
+
+<p>O arquivo de configuração, do ponto de vista do usuário (e não do root), é <code>~/.ssh/config</code>. Pelo amor de <code>StrictModes</code>, tudo dentro do meu diretório <code>.ssh</code> tem permissão <code>0600</code>. Os passos descritos abaixo estão todos contidos nesse arquivo.</p>
+
+<ol>
+<li><p>Configure o comportamento padrão:
+Essa parte precisa seguir o que configuramos no servidor SSH no VPS. Eu quero dizer ao meu cliente SSH para somente usar aqueles algoritmos especificos de criptogrfia, com aquele método de key exchange com aquele cipher específico. A entrada do <code>Host *</code> fornece configuração padrão global para todos os outros hosts, então eu não preciso ficar repetindo os mesmos parâmetros em cada entrada <code>Host</code>:</p>
+
+<pre><code>Host *
+    KexAlgorithms curve25519-sha256@libssh.org
+    Ciphers chacha20-poly1305@openssh.com
+    MACs hmac-sha2-512-etm@openssh.com
+    ForwardAgent no
+    UseRoaming no
+</code></pre>
+
+<p>Isso será aplicado a todos os servidores que eu conectar daqui em diantes. Se um servidor necessitar de um parâmetro diferente, crie uma entrada específica para aquele Host. Abaixo vemos também um exemplo para o Github.</p>
+
+<p>No exemplo acima, note as duas linhas de configuração extras:</p>
+
+<p>1.1) <code>ForwardAgent no</code>
+    Essa é a configuração padrão, mas eu quero ter certeza de que se eu começar a usar o ssh-agent para gerenciar minhas chaves privadas, eu não quero que ele faça &ldquo;forward&rdquo; delas para servidores remotos.</p>
+
+<p>1.2) <code>UseRoaming no</code><br />
+    Esse é a funcionalidade miserável e não documentada que poderia expor minhas chaves privadas a atacantes no caso de um ataque MITM.</p></li>
+
+<li><p>Crie uma chave para cada servidor que você tem acesso:<br />
+Nesse exemplo, eu criei uma específica para o Github. Não se esqueça de usar um passphrase complexo para criptografar sua chave:<br />
+`<code>
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_github -C &quot;user@computer&quot; -o -a 128
+</code></p>
+
+<p>O comentário aqui com a opção <code>-C</code> é importante para que você consiga identificar facilmente de onde aquela chave pertence. Imagine em um servidor, onde você conecta com 10 máquinas diferentes. Qual chave pública pertence a qual máquina? Então, faça isso com esse comentário.</p></li>
+
+<li><p>Configure <code>~/.ssh/config</code> para servidores específicos:</p>
+
+<pre><code>Host github.com
+    Hostname ssh.github.com
+    Port 443
+    IdentityFile ~/.ssh/id_ed25519_github
+</code></pre>
+
+<p>Aqui está a <a href="https://help.github.com/articles/using-ssh-over-the-https-port/">ajuda do Github</a> em como configurar.<br />
+Para o seu próprio VPS, o processo é similar. Crie uma nova chave, crie o blocl <code>Host</code> no seu arquivo <code>~/.ssh/config</code>, adicione sua chave pública no arquivo <code>authorized_keys</code> no usuário do servidor, e pronto. Aqui está a entrada para o meu próprio VPS:</p>
+
+<pre><code>Host example.com
+    ServerAliveInterval 30
+    StrictHostKeyChecking yes
+    IdentityFile ~/.ssh/id_ed25519_example.com
+</code></pre>
+
+<p>Nesse exemplo, eu adiciono a opção <code>StrictHostKeyChecking</code> para ter certeza de que se alguma coisa acontecer com a chave do meu servidor - caso o &ldquo;fingerprint&rdquo; mudou, ou estou sofrendo um ataque de MITM, qualquer coisa - eu sou bloqueado de conectar. Isso previne a troca automática do fingerprint do servidor no meu arquivo <code>known_hosts</code>, que seria catrastrófico.</p></li>
+
+<li><p>Adicione sua chave no ssh-agent:
+Sério, você não quer continuar digitando pra sempre a sua super senha a cada vez que você se conecta no servidor VPS. Usando o ssh-agent faz com que seja mais difícil para atacantes se eles tiverem comprometido seu sistema local e tudo o que você digita é capturado por eles. Então, imagine isso. Mesmo que o atacante tenha uma cópia da sua chave privada, veja tudo o que você digita, mas não seja capaz de entrar na sua VPS de outro computador que não o seu. Certamente ele poderia adicionar uma chave que ele mesmo controla no arquivo authorized_keys do servidor, mas isso já levantaria umas suspeitas. É aqui que o duplo fator de autenticação entra em jogo.</p></li>
+</ol>
+
+<h2 id="duplo-fator-de-autenticação:a6b9f62d776ebe461e78b63abd067512">Duplo Fator de Autenticação</h2>
+
+<p>Na minha opinião, autenticar com uma chave que eu controlo e protejo já é o suficiente. Mesmo que minha chave privada seja comprometida, ela está criptografada com um passphrase forte e difícil de se quebrar com brute-force. Meu servidor SSH não permite nada a não ser a minha chave de autenticação, então as credenciais do meu usuário local no servidor Linux está seguro. Eu também posso bloquear os endereços IP de origem dos atacantes se tentarem brute-force com ferramentas como <a href="http://www.fail2ban.org/wiki/index.php/Main_Page">fail2ban</a>.</p>
+
+<p>Mas existem alguns casos em que você gostaria de usar um outro fator de autenticação. Isso pode ser alcançado com o <code>google-authenticator</code>, onde você usa o seu celular para gerar um OTP - One Time Passwords - que é necessário para autenticação, além da sua chave e passphrase. Então mesmo que sua chave e seu passphrase sejam comprometidos pelo atacante, ele não consegue se autenticar porque ele não tem o seu celular.</p>
+
+<p>Em um próximo post eu discuto em mais detalhes o ssh-agent e o duplo fator de autenticação.</p>
+
+  			</section>
+
+  			<footer class="post-footer">
+  				<div class="post-tags">
+            
+            
+                <a href="http://gammenion.github.io/tags/SSH/">SSH</a>
+            
+                <a href="http://gammenion.github.io/tags/Hardening/">Hardening</a>
+            
+            
+  				</div>
+  				<div class="post-share">
+  					<a class="icon-twitter" href="https://twitter.com/share?text=Hardening%20de%20SSH%20para%20sua%20VPS&url=http%3a%2f%2fgammenion.github.io%2fbr%2fpost%2fssh-hardening" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+  						<span>Twitter</span>
+  					</a>
+  					<a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fgammenion.github.io%2fbr%2fpost%2fssh-hardening" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+  						<span>Facebook</span>
+  					</a>
+  					<a class="icon-gplus" href="https://plus.google.com/share?url=http%3a%2f%2fgammenion.github.io%2fbr%2fpost%2fssh-hardening" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+  						<span>Google+</span>
+  					</a>
+  				</div>
+  			</footer>
+
+  			<aside class="post-comments">
+    
+    
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_shortname = 'disqus_QBNiJaWTUH';
+      var disqus_identifier = 'http:\/\/gammenion.github.io\/br\/post\/ssh-hardening';
+      var disqus_title = 'Hardening de SSH para sua VPS';
+      var disqus_url = 'http:\/\/gammenion.github.io\/br\/post\/ssh-hardening';
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    
+    
+</aside>
+
+
+			</div>
+
+			<nav class="post-nav">
+				
+					<a class="post-nav-item post-nav-next" href="http://gammenion.github.io/br/post/fw1-loggrabber">
+						<section class="post-nav-teaser">
+							<span class="post-nav-icon"><i class="icon-arrow-left"></i></span>
+							<span class="post-nav-info">
+								<h4 class="post-nav-title">Coletando logs do Check Point usando fw1-loggrabber</h4>
+								<p class="post-nav-excerpt">Extraindo logs para arquivos&hellip;</p>
+							</span>
+						</section>
+					</a>
+				
+				
+				<div class="clear"></div>
+			</nav>
+
+		</div>
+	</article>
+</main>
+
+				<div id="body-class" style="display: none;"></div>
+				<footer id="footer">
+					<section class="credits">
+						<span class="credits-theme">Theme <a href="https://github.com/zenithar/hugo-theme-bleak" target="_blank" rel="nofollow">Bleak</a> by <a href="http://zutrinken.com" target="_blank" rel="nofollow">zutrinken</a></span>
+						<span class="credits-software">Published with <a href="http://gohugo.io" target="_blank" rel="nofollow">Hugo</a></span>
+					</section>
+				</footer>
+				
+<div id="menu" data-target="menu">
+	<div class="menu-header">
+		<span class="menu-label">Menu</span>
+		<a class="menu-close" data-action="menu" data-target="menu"></a>
+	</div>
+	<div id="toc" class="menu-list">
+		<nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#tl-dr:a6b9f62d776ebe461e78b63abd067512">TL;DR</a></li>
+<li><a href="#intro:a6b9f62d776ebe461e78b63abd067512">Intro</a></li>
+<li><a href="#o-início:a6b9f62d776ebe461e78b63abd067512">O Início</a></li>
+<li><a href="#o-servidor:a6b9f62d776ebe461e78b63abd067512">O Servidor</a></li>
+<li><a href="#o-cliente:a6b9f62d776ebe461e78b63abd067512">O Cliente</a></li>
+<li><a href="#duplo-fator-de-autenticação:a6b9f62d776ebe461e78b63abd067512">Duplo Fator de Autenticação</a></li>
+</ul></li>
+</ul>
+</nav>
+	</div>
+</div>
+<div class="overlay"></div>
+
+
+			</div>
+		</section>
+
+    <script>
+      (function(c,f){asyncLoader=function(i,h){i.foreach(function(k,j){e(j,d(j),h)});if(typeof h.callback=="function"){var g=setInterval(function(){if(f.readyState==="complete"){clearInterval(g);h.callback()}},10)}};var d=function(g){var h=g.split(".");return h[h.length-1]},e=function(h,i,g){switch(i){case"js":a(h,g);break;case"css":b(h);break;default:break}},a=function(i,h){var g=document.createElement("script");g.type="text/javascript";g.async=true;g.src=i;document.getElementsByTagName("head")[0].appendChild(g)},b=function(g){var h=document.createElement("link");h.type="text/css";h.rel="stylesheet";h.href=g;document.getElementsByTagName("head")[0].appendChild(h)};Array.prototype.foreach=function(h){for(var g=0;g<this.length;g++){h(g,this[g])}}})(this,document);
+
+      asyncLoader([
+				"/js/dependencies.js",
+				"/css/dependencies.css"
+      ],{
+        callback:function(){
+					asyncLoader([
+						"/css/style.css",
+						"/js/script.js"
+					], {
+						callback: function() {}
+					});
+        }
+      });
+    </script>
+	
+	</body>
+</html>
+

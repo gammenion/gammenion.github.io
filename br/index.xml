@@ -6,8 +6,244 @@
     <description>Recent content on Segurança das Coisas</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
-    <lastBuildDate>Sat, 05 Mar 2016 14:23:22 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 23 Mar 2016 00:00:00 +0100</lastBuildDate>
     <atom:link href="http://gammenion.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Hardening de SSH para sua VPS</title>
+      <link>http://gammenion.github.io/br/post/ssh-hardening</link>
+      <pubDate>Wed, 23 Mar 2016 00:00:00 +0100</pubDate>
+      
+      <guid>http://gammenion.github.io/br/post/ssh-hardening</guid>
+      <description>
+
+&lt;h2 id=&#34;tl-dr:a6b9f62d776ebe461e78b63abd067512&#34;&gt;TL;DR&lt;/h2&gt;
+
+&lt;p&gt;VPS - Virtual Private Servers - normalmente vem com um monte de configurações padrão. Nesse post eu descrevo como configurar o servidor SSH de forma segura para um servidor simples, como um VPS onde eu sou o único usuário e eu tenho controle total do servidor e do cliente.&lt;/p&gt;
+
+&lt;h2 id=&#34;intro:a6b9f62d776ebe461e78b63abd067512&#34;&gt;Intro&lt;/h2&gt;
+
+&lt;p&gt;Um dos benefícios de se ter uma VPS
+One of the things of having a VPS - Virtual Private Server - é a liberdade de fazer o que quiser com um sistema que está no ar o tempo todo &lt;a href=&#34;https://www.ovh.com/us/dedicated-cloud/discover/sla.xml&#34;&gt;(ou quase o tempo todo)&lt;/a&gt;. Eu uso OVH por razões que me fogem da memória. Na verdade, isso não importa. Onde quer que o servidor esteja, seja na Amazon AWS, Microsoft Azure, Linode, um Raspberry Pi rodando na sua sala ou o seu &lt;a href=&#34;http://libertyvps.net/&#34;&gt;provedor &amp;ldquo;underground&amp;rdquo;/privado favorito que aceita bitcoins&lt;/a&gt;, ele não contará com uma configuração padrão ao nível de um administrator consciente de segurança.&lt;/p&gt;
+
+&lt;p&gt;Na atualidade, o SSH é o de facto standard para acesso remoto. Os tempos áureos do telnet em um hub de 10Mbps, onde conseguia-se sniffar tudo, estão acabados. Apesar disso, configurar e usar criptografia é um desafio, e SSH não é diferente.&lt;/p&gt;
+
+&lt;p&gt;O objetivo principal de usar SSH e um túnel criptografado entre dois computadores é proteger o conteúdo que trafega entre eles através do canal encriptado - e também muitos outros atributos de segurança, como autenticação e integridade de mensagem. Se esse túnel for comprometido por algum motivo, más coisas podem acontecer.&lt;/p&gt;
+
+&lt;p&gt;Existem &lt;a href=&#34;http://www.coresecurity.com/content/ssh-insertion-attack&#34;&gt;vários&lt;/a&gt; &lt;a href=&#34;https://blog.sucuri.net/2013/07/ssh-brute-force-the-10-year-old-attack-that-still-persists.html&#34;&gt;tipos&lt;/a&gt; &lt;a href=&#34;https://sites.google.com/site/clickdeathsquad/Home/cds-ssh-mitmdowngrade&#34;&gt;de ataques&lt;/a&gt; que focam no lado criptográfico do SSH e não no protocolo propriamente dito. Dá um Google em &amp;ldquo;SSH attacks&amp;rdquo; pra você ver.&lt;/p&gt;
+
+&lt;p&gt;No decorrer desse post eu vou mostrar as fontes de informação que eu coletei para criar a configuração do meu SSH. Eu não vou fazer desenhos de como SSH funciona, sobre key exchange, MACs ou qualquer outra coisa porque já existem muitos sites por aí com explicações brilhantes. Eu também não entrarei em muitos detalhes em relação a criptografia propriamente dita- apesar de ser um tópico muito interessante, não é o foco desse post.&lt;/p&gt;
+
+&lt;p&gt;Vale aqui a menção ao &lt;a href=&#34;https://stribika.github.io/2015/01/04/secure-secure-shell.html&#34;&gt;blog post do stribika&lt;/a&gt; que me inspirou a fazer tudo isso, apesar de não estar fazendo isso para me proteger de uma certa agência norte-americana de três letras que não deve ser nomeada. Segurança está livremente disponível e eu usar a melhor que tem. Ponto.&lt;/p&gt;
+
+&lt;h2 id=&#34;o-início:a6b9f62d776ebe461e78b63abd067512&#34;&gt;O Início&lt;/h2&gt;
+
+&lt;p&gt;Primeiro de tudo, é necessário entender algo sobre SSH que eu relevei por MUITO tempo. Conectar um computador com o outro envolve DOIS computadores. &lt;em&gt;Não é suficiente&lt;/em&gt; otimizar a configuração somente do servidor SSH. Veja referências ao &lt;a href=&#34;https://www.digitalocean.com/community/tutorials/how-to-fix-openssh-s-client-bug-cve-0216-0777-and-cve-0216-0778-by-disabling-useroaming&#34;&gt;CVE-0216-0777 e CVE-0216-0778&lt;/a&gt; em relação ao UseRoaming e também sobre esse excelente trabalho de &lt;a href=&#34;https://github.com/FiloSottile/whosthere&#34;&gt;Filippo Valsorda&lt;/a&gt; onde ele identifica quem você é pela chave SSH que você usa.&lt;/p&gt;
+
+&lt;p&gt;Eu vou começar com a configuração do servidor e depois vou para o cliente. &lt;em&gt;NÃO PULE A CONFIGURAÇÃO DO CLIENTE&lt;/em&gt; como eu fiz por muitos anos da minha vida.&lt;/p&gt;
+
+&lt;h2 id=&#34;o-servidor:a6b9f62d776ebe461e78b63abd067512&#34;&gt;O Servidor&lt;/h2&gt;
+
+&lt;p&gt;Você recebe o servidor VPS. Beleza! Você sabe quais são as chaves SSH que o servidor está usando e quais opções de criptografia que foram usados para criá-las? Muitos desses VPS se valem de configurações automáticas de geração de chave do pacote do servidor openssh durante seu provisionamento automático, o que é mais ou menos tudo bem. O fato é que eu não confio o suficiente no provedor (para criação da chave SSH, e não por ter a habilidade de acessar todos os meus dados armazenados em disco e em memória, e roubar todas as minhas chaves).&lt;/p&gt;
+
+&lt;p&gt;Existem &lt;em&gt;histórias de horror&lt;/em&gt; como &lt;a href=&#34;http://wiki.hetzner.de/index.php/Ed25519/en&#34;&gt;esse aqui&lt;/a&gt; onde Hetzner, um provedor de VPS, reusou a mesma chave do servidor de SSH em uma série de clientes devido a um erro de configuração.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Due to an error in the installation software introduced on April 10th, 2015, the Ed25519 SSH host keys (/etc/ssh/ssh_host_ed25519_key) on our standard images were no longer automatically regenerated. This resulted in identical Ed25519 SSH host keys for each affected OS image.&lt;/code&gt; &amp;ndash; Hetzner&lt;/p&gt;
+
+&lt;p&gt;Lembrando. Eu sou o único usuário desse sistema. Eu decido qual é o nível de criptografia eu quero e eu não me importo com &amp;ldquo;backward compatibility&amp;rdquo; e clientes SSH velhos. Meu objetivo é usar o maior nível de criptografia possível, evitar ataques de &amp;ldquo;downgrade&amp;rdquo;, dificultar a descriptografia do meu tráfego por atacantes, etc. Eu crio e protejo minhas próprias senhas.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Recrie as chaves do seu servidor SSH&lt;br /&gt;
+Não existe razão para o servidor oferecer múltiplas chaves para autenticação do servidor. A ferramenta &lt;code&gt;ssh-keygen&lt;/code&gt; oferece uma série de opções para o tipo de chave para criar. Minha opção é sempre usar &lt;a href=&#34;https://ed25519.cr.yp.to/&#34;&gt;ed25519&lt;/a&gt; mesmo que RSA com uma chave suficientemente grande seja igualmente seguro. Minha chave então se chama &lt;code&gt;/etc/ssh/ssh_server_ed25519&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ssh-keygen -t ed25519 -f /etc/ssh/ssh_server_ed25519 -o -a 128
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Essa chave não pode ter um passphrase. É assim que SSH funciona. Você reinicia o servidor, o SSH inicializa e tudo funciona. Tenha certeza de que as permissões para o novo arquivo de chave criado é 600 (-rw&amp;mdash;&amp;mdash;-).&lt;br /&gt;
+Note o parâmetro &lt;code&gt;-o -a 128&lt;/code&gt;. Esse é o número de rodadas usado para derivar a chave. O padrão é 16. Nossos computadores poderosos são capazes de fazer essa matemática em 2 segundos, mais ou menos. Existe uma boa explicação para isso &lt;a href=&#34;https://martin.kleppmann.com/2013/05/24/improving-security-of-ssh-private-keys.html&#34;&gt;aqui&lt;/a&gt;&lt;br /&gt;
+Para evitar falha de configuração, certifique-se de remove todas as chaves antigas que estavam no servidor anteriormente.&lt;/p&gt;
+
+&lt;p&gt;Também, note a digital (fingerprint) das chave pública que acabou de ser gerada. A saída é parecida com essa:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;The key fingerprint is:
+ed:9a:3d:e6:dd:61:4d:99:cd:68:09:6c:b0:af:e2:4e example.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Você pode verificar isso depois com o seguinte comando:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ssh-keygen -lf /etc/ssh/ssh_server_ed25519.pub
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Reconfigure o arquivo &lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt;&lt;br /&gt;
+A maioria das configurações e explicações estão aqui. Abaixo está a cópia do meu próprio &lt;code&gt;sshd_config&lt;/code&gt; e vamos linha por linha. Algumas linhas já são a configuração padrão do SSH, mas eu quero ter certeza total do comportamento que eu quero.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Port 22
+Protocol 2
+HostKey /etc/ssh/ssh_server_ed25519
+AllowGroups ssh-allowed
+ClientAliveInterval 300
+ClientAliveCountMax 0
+KexAlgorithms curve25519-sha256@libssh.org
+Ciphers chacha20-poly1305@openssh.com
+MACs hmac-sha2-512-etm@openssh.com
+UsePrivilegeSeparation yes
+SyslogFacility AUTH
+LogLevel VERBOSE
+LoginGraceTime 120
+PermitRootLogin no
+StrictModes yes
+PubkeyAuthentication yes
+IgnoreRhosts yes
+HostbasedAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+X11Forwarding no
+PrintMotd no
+PrintLastLog yes
+TCPKeepAlive yes
+UseLogin no
+PermitTunnel no
+AcceptEnv LANG LC_*
+Subsystem sftp /usr/lib/openssh/sftp-server
+UsePAM no
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Aqui está a explicação para os pedaços importantes:&lt;/p&gt;
+
+&lt;p&gt;2.1) &lt;code&gt;Port 22&lt;/code&gt;&lt;br /&gt;
+    Somente aceite conexões na porta 22 em todas as interfaces de rede do servidor. Mudar isso para um outro valor por motivos de &amp;ldquo;segurança&amp;rdquo; significa segurança por obscuridade e é ridículo, na minha opinião. Ao invés disso, é melhor usar um firewall local que filtre conexões de entrada baseados no endereço IP de origem.&lt;/p&gt;
+
+&lt;p&gt;2.2) &lt;code&gt;Protocol 2&lt;/code&gt;&lt;br /&gt;
+    Porque protocol 1 já está ultrapassado e não oferece mais segurança.&lt;/p&gt;
+
+&lt;p&gt;2.3) &lt;code&gt;HostKey /etc/ssh/ssh_server_ed25519&lt;/code&gt;&lt;br /&gt;
+    A nova chave do servidor que se acabou de criar.&lt;/p&gt;
+
+&lt;p&gt;2.4) &lt;code&gt;AllowGroups ssh-allowed&lt;/code&gt;&lt;br /&gt;
+    Somente usuários do grupo Linux &lt;code&gt;ssh-allowed&lt;/code&gt; são permitidos de entrar através de SSH. Isso é pra proteger a mim mesmo de possíveis erros, tipo criando um usuário temporário e acabar afetando a segurança do servidor.&lt;/p&gt;
+
+&lt;p&gt;2.5) &lt;code&gt;ClientAliveInterval 300&lt;/code&gt; and &lt;code&gt;ClientAliveCountMax 0&lt;/code&gt;&lt;br /&gt;
+    Tempo de inatividade do usuário em segundos. Isso é forçado no lado do servidor.&lt;/p&gt;
+
+&lt;p&gt;2.6) &lt;code&gt;KexAlgorithms curve25519-sha256@libssh.org&lt;/code&gt;&lt;br /&gt;
+    Não existe razão para usar múltiplos algoritmos de key exchange. Usar ECDH com Curve25519 com SHA2 é perfeitamente ok e eu não quero ligar pra moduli com tamanhos de bit insuficientes no cado de Diffie-Hellman group exchanges.&lt;/p&gt;
+
+&lt;p&gt;2.7) &lt;code&gt;Ciphers chacha20-poly1305@openssh.com&lt;/code&gt;&lt;br /&gt;
+    Essa é a criptografia simétrica que finalmente criptografa o conteúdo indo pelo túnel entre o cliente e servidor. Esse cipher oferece o melhor disponível, evita análise de tráfego por um atacante, e por aí vai.&lt;/p&gt;
+
+&lt;p&gt;2.8) &lt;code&gt;MACs hmac-sha2-512-etm@openssh.com&lt;/code&gt;&lt;br /&gt;
+    Para a integridade da comunicação, esse algoritmo fornece Encrypt-then-MAC com a maior tamanho de chave disponível.&lt;/p&gt;
+
+&lt;p&gt;2.9) &lt;code&gt;UsePrivilegeSeparation yes&lt;/code&gt;&lt;br /&gt;
+    Não rode o daemon ssh com uma conta privilegiada. Essa configuração cria processos filhos não-privilegiados para lidar com o tráfego de rede. Se o servidor for comprometido através do daemon ssh, o atacante receberá acesso com poucos privilégios e precisará trabalhar mais para escalar privilégios.&lt;/p&gt;
+
+&lt;p&gt;2.10) &lt;code&gt;LogLevel VERBOSE&lt;/code&gt;&lt;br /&gt;
+    Temos muito espaço em disco, então porque não fazer log de todas as informações disponíveis de um dos serviços mais importantes do meu VPS.&lt;/p&gt;
+
+&lt;p&gt;2.11) &lt;code&gt;PermitRootLogin no&lt;/code&gt;&lt;br /&gt;
+    Essa é a configuração default, mas alguns VPS te dão acesso remoto direto com root por default. Você não quer usar root pra acesso remoto ao servidor. Crie seu próprio usuário não privilegiado para se conectar remotamente e somente escale privilégios quando necessário.&lt;/p&gt;
+
+&lt;p&gt;2.12) &lt;code&gt;StrictModes yes&lt;/code&gt;&lt;br /&gt;
+    Isso me protege contra falha de configuração. Ele checa se as permissões dos arquivos de chave, entre outras coisas, estão devidamente configuradas.&lt;/p&gt;
+
+&lt;p&gt;2.13) &lt;code&gt;PubkeyAuthentication yes&lt;/code&gt;&lt;br /&gt;
+    Permita autenticação com chaves públicas. Isso é fundamental para o que estamos querendo fazer e desabilitar autenticação por senha.&lt;/p&gt;
+
+&lt;p&gt;2.14) &lt;code&gt;IgnoreRhosts yes&lt;/code&gt; and &lt;code&gt;HostbasedAuthentication no&lt;/code&gt;&lt;br /&gt;
+    Esse é o padrão, mas eu quero ter certeza.&lt;/p&gt;
+
+&lt;p&gt;2.15) &lt;code&gt;PasswordAuthentication no&lt;/code&gt; and &lt;code&gt;PermitEmptyPasswords no&lt;/code&gt;&lt;br /&gt;
+    Eu quero fazer login usando uma chave, e não com a senha do meu usuário no Linux.&lt;/p&gt;
+
+&lt;p&gt;2.16) &lt;code&gt;ChallengeResponseAuthentication no&lt;/code&gt;&lt;br /&gt;
+    Esse é complicado e eu uso as duas formas. Até o manual do sshd-config é difícil de entender. Se eu quero somente me autenticar usando minha chave, eu coloco &lt;code&gt;no&lt;/code&gt;. Mais a frente eu discuto duplo-fator de autenticação, onde será necessário mudar essa configuração pra &lt;code&gt;yes&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;2.17) &lt;code&gt;X11Forwarding no&lt;/code&gt;&lt;br /&gt;
+    Eu não uso X11, o padrão é &lt;code&gt;no&lt;/code&gt; mas eu quero ter certeza.&lt;/p&gt;
+
+&lt;p&gt;2.18) &lt;code&gt;UseLogin no&lt;/code&gt;&lt;br /&gt;
+    Esse é o padrão, mas eu quero ter certeza de que &lt;code&gt;login(1)&lt;/code&gt; não será usado para autenticação.&lt;/p&gt;
+
+&lt;p&gt;2.19) &lt;code&gt;PermitTunnel no&lt;/code&gt;&lt;br /&gt;
+    Esse é o padrão, mas eu quero ter certeza de que eu somente uso SSH para conectar a VPS, nada mais.&lt;/p&gt;
+
+&lt;p&gt;2.20) &lt;code&gt;UsePAM no&lt;/code&gt;&lt;br /&gt;
+    Essa configuração é parecida com o ChallengeResponseAuthentication. Se eu estou usando somente a chave para autenticação, eu coloco &lt;code&gt;no&lt;/code&gt;. Se eu uso qualquer outra coisa, eu uso &lt;code&gt;yes&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;o-cliente:a6b9f62d776ebe461e78b63abd067512&#34;&gt;O Cliente&lt;/h2&gt;
+
+&lt;p&gt;A configuração do cliente é muito semelhante a do servidor. Você cria chaves fortes, define algoritmos critográficos para tudo, disabilita coisas inúteis, pronto.&lt;/p&gt;
+
+&lt;p&gt;Mas o ponto mais importante aqui é o uso de chaves diferentes para servidores diferentes. No passado, eu usava apenas uma chave e adicionava ela no arquivo authorized_keys de todos os servidores em que eu tinha acesso. No final, eu não tinha mais idéia de onde as chaves estavam, quais servidores eu tinha acesso, etc. O risco aqui é que se sua chave privada for comprometida, perdida, roubada, copiada sem querer no Dropbox/Github/USB, vai ser muito difícil saber o tamanho do estrago.&lt;/p&gt;
+
+&lt;p&gt;Por isso, eu proponho o uso de uma chave diferente para cada servidor eu gerencio. Sim, isso cria um stress gerencial, mas estamos falando sobre melhores hábitos de segurança e, no final das contas, eu não tenho acesso a muitos servidores mesmo. Eu estou falando sobre meu próprio VPS. Então porque não criar uma chave separada para acessá-lo? Isso também é válido para serviços como Github e tudo o que usa SSH.&lt;/p&gt;
+
+&lt;p&gt;O arquivo de configuração, do ponto de vista do usuário (e não do root), é &lt;code&gt;~/.ssh/config&lt;/code&gt;. Pelo amor de &lt;code&gt;StrictModes&lt;/code&gt;, tudo dentro do meu diretório &lt;code&gt;.ssh&lt;/code&gt; tem permissão &lt;code&gt;0600&lt;/code&gt;. Os passos descritos abaixo estão todos contidos nesse arquivo.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Configure o comportamento padrão:
+Essa parte precisa seguir o que configuramos no servidor SSH no VPS. Eu quero dizer ao meu cliente SSH para somente usar aqueles algoritmos especificos de criptogrfia, com aquele método de key exchange com aquele cipher específico. A entrada do &lt;code&gt;Host *&lt;/code&gt; fornece configuração padrão global para todos os outros hosts, então eu não preciso ficar repetindo os mesmos parâmetros em cada entrada &lt;code&gt;Host&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host *
+    KexAlgorithms curve25519-sha256@libssh.org
+    Ciphers chacha20-poly1305@openssh.com
+    MACs hmac-sha2-512-etm@openssh.com
+    ForwardAgent no
+    UseRoaming no
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Isso será aplicado a todos os servidores que eu conectar daqui em diantes. Se um servidor necessitar de um parâmetro diferente, crie uma entrada específica para aquele Host. Abaixo vemos também um exemplo para o Github.&lt;/p&gt;
+
+&lt;p&gt;No exemplo acima, note as duas linhas de configuração extras:&lt;/p&gt;
+
+&lt;p&gt;1.1) &lt;code&gt;ForwardAgent no&lt;/code&gt;
+    Essa é a configuração padrão, mas eu quero ter certeza de que se eu começar a usar o ssh-agent para gerenciar minhas chaves privadas, eu não quero que ele faça &amp;ldquo;forward&amp;rdquo; delas para servidores remotos.&lt;/p&gt;
+
+&lt;p&gt;1.2) &lt;code&gt;UseRoaming no&lt;/code&gt;&lt;br /&gt;
+    Esse é a funcionalidade miserável e não documentada que poderia expor minhas chaves privadas a atacantes no caso de um ataque MITM.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Crie uma chave para cada servidor que você tem acesso:&lt;br /&gt;
+Nesse exemplo, eu criei uma específica para o Github. Não se esqueça de usar um passphrase complexo para criptografar sua chave:&lt;br /&gt;
+`&lt;code&gt;
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_github -C &amp;quot;user@computer&amp;quot; -o -a 128
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;O comentário aqui com a opção &lt;code&gt;-C&lt;/code&gt; é importante para que você consiga identificar facilmente de onde aquela chave pertence. Imagine em um servidor, onde você conecta com 10 máquinas diferentes. Qual chave pública pertence a qual máquina? Então, faça isso com esse comentário.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Configure &lt;code&gt;~/.ssh/config&lt;/code&gt; para servidores específicos:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host github.com
+    Hostname ssh.github.com
+    Port 443
+    IdentityFile ~/.ssh/id_ed25519_github
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Aqui está a &lt;a href=&#34;https://help.github.com/articles/using-ssh-over-the-https-port/&#34;&gt;ajuda do Github&lt;/a&gt; em como configurar.&lt;br /&gt;
+Para o seu próprio VPS, o processo é similar. Crie uma nova chave, crie o blocl &lt;code&gt;Host&lt;/code&gt; no seu arquivo &lt;code&gt;~/.ssh/config&lt;/code&gt;, adicione sua chave pública no arquivo &lt;code&gt;authorized_keys&lt;/code&gt; no usuário do servidor, e pronto. Aqui está a entrada para o meu próprio VPS:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host example.com
+    ServerAliveInterval 30
+    StrictHostKeyChecking yes
+    IdentityFile ~/.ssh/id_ed25519_example.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Nesse exemplo, eu adiciono a opção &lt;code&gt;StrictHostKeyChecking&lt;/code&gt; para ter certeza de que se alguma coisa acontecer com a chave do meu servidor - caso o &amp;ldquo;fingerprint&amp;rdquo; mudou, ou estou sofrendo um ataque de MITM, qualquer coisa - eu sou bloqueado de conectar. Isso previne a troca automática do fingerprint do servidor no meu arquivo &lt;code&gt;known_hosts&lt;/code&gt;, que seria catrastrófico.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Adicione sua chave no ssh-agent:
+Sério, você não quer continuar digitando pra sempre a sua super senha a cada vez que você se conecta no servidor VPS. Usando o ssh-agent faz com que seja mais difícil para atacantes se eles tiverem comprometido seu sistema local e tudo o que você digita é capturado por eles. Então, imagine isso. Mesmo que o atacante tenha uma cópia da sua chave privada, veja tudo o que você digita, mas não seja capaz de entrar na sua VPS de outro computador que não o seu. Certamente ele poderia adicionar uma chave que ele mesmo controla no arquivo authorized_keys do servidor, mas isso já levantaria umas suspeitas. É aqui que o duplo fator de autenticação entra em jogo.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;duplo-fator-de-autenticação:a6b9f62d776ebe461e78b63abd067512&#34;&gt;Duplo Fator de Autenticação&lt;/h2&gt;
+
+&lt;p&gt;Na minha opinião, autenticar com uma chave que eu controlo e protejo já é o suficiente. Mesmo que minha chave privada seja comprometida, ela está criptografada com um passphrase forte e difícil de se quebrar com brute-force. Meu servidor SSH não permite nada a não ser a minha chave de autenticação, então as credenciais do meu usuário local no servidor Linux está seguro. Eu também posso bloquear os endereços IP de origem dos atacantes se tentarem brute-force com ferramentas como &lt;a href=&#34;http://www.fail2ban.org/wiki/index.php/Main_Page&#34;&gt;fail2ban&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Mas existem alguns casos em que você gostaria de usar um outro fator de autenticação. Isso pode ser alcançado com o &lt;code&gt;google-authenticator&lt;/code&gt;, onde você usa o seu celular para gerar um OTP - One Time Passwords - que é necessário para autenticação, além da sua chave e passphrase. Então mesmo que sua chave e seu passphrase sejam comprometidos pelo atacante, ele não consegue se autenticar porque ele não tem o seu celular.&lt;/p&gt;
+
+&lt;p&gt;Em um próximo post eu discuto em mais detalhes o ssh-agent e o duplo fator de autenticação.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Coletando logs do Check Point usando fw1-loggrabber</title>
