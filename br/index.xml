@@ -11,10 +11,10 @@
     
     <item>
       <title>Hardening de SSH para sua VPS</title>
-      <link>http://gammenion.github.io/br/post/ssh-hardening</link>
+      <link>http://gammenion.github.io/post/ssh-hardening</link>
       <pubDate>Wed, 23 Mar 2016 00:00:00 +0100</pubDate>
       
-      <guid>http://gammenion.github.io/br/post/ssh-hardening</guid>
+      <guid>http://gammenion.github.io/post/ssh-hardening</guid>
       <description>
 
 &lt;h2 id=&#34;tl-dr:a6b9f62d776ebe461e78b63abd067512&#34;&gt;TL;DR&lt;/h2&gt;
@@ -249,10 +249,10 @@ Sério, você não quer continuar digitando pra sempre a sua super senha a cada 
     
     <item>
       <title>Coletando logs do Check Point usando fw1-loggrabber</title>
-      <link>http://gammenion.github.io/br/post/fw1-loggrabber</link>
+      <link>http://gammenion.github.io/post/fw1-loggrabber</link>
       <pubDate>Sat, 05 Mar 2016 14:23:22 +0100</pubDate>
       
-      <guid>http://gammenion.github.io/br/post/fw1-loggrabber</guid>
+      <guid>http://gammenion.github.io/post/fw1-loggrabber</guid>
       <description>
 
 &lt;h2 id=&#34;tl-dr:3780de4ec6e539fd9e79f53f296c60bf&#34;&gt;TL;DR&lt;/h2&gt;
