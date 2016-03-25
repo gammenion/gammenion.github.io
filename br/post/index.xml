@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Segurança das Coisas</title>
-    <link>http://gammenion.github.io/post/</link>
+    <link>http://gammenion.github.io/br/post/</link>
     <description>Recent content in Posts on Segurança das Coisas</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <lastBuildDate>Wed, 23 Mar 2016 00:00:00 +0100</lastBuildDate>
-    <atom:link href="http://gammenion.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://gammenion.github.io/br/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Hardening de SSH para sua VPS</title>
@@ -286,7 +286,7 @@ Sério, você não quer continuar digitando pra sempre a sua super senha a cada 
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/01.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/01.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -295,7 +295,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/02.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/02.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -308,7 +308,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/03.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/03.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -317,7 +317,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/04.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/04.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -326,7 +326,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/05.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/05.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -346,7 +346,7 @@ O servidor Linux é 172.16.1.10:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/06.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/06.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -392,7 +392,7 @@ user@debian:~/fw1-loggrabber$ git clone https://github.com/certego/fw1-loggrabbe
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/07.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/07.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -404,7 +404,7 @@ user@debian:~/fw1-loggrabber$ git clone https://github.com/certego/fw1-loggrabbe
 &lt;p&gt;
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/08.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/08.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -436,7 +436,7 @@ user@debian:~/opsec-tools/linux22$ opsec_pull_cert -h 172.16.1.1 -n LogGrabberOP
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/09.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/09.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -469,7 +469,7 @@ user@debian:~/opsec-tools/linux22$ opsec_pull_cert -h 172.16.1.1 -n LogGrabberOP
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/10.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/10.png&#34; /&gt;
     
     
 &lt;/figure&gt;
@@ -478,7 +478,7 @@ O DN pode ser encontrado no campo em evidência abaixo:&lt;br /&gt;
 
 &lt;figure &gt;
     
-        &lt;img src=&#34;http://gammenion.github.io/img/11.png&#34; /&gt;
+        &lt;img src=&#34;http://gammenion.github.io/br/img/11.png&#34; /&gt;
     
     
 &lt;/figure&gt;
